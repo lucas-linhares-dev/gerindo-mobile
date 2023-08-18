@@ -4,10 +4,20 @@ import Home from '../../screens/Home';
 import Clientes from '../../screens/Clientes';
 
 export default function NavigationDrawer() {
-    return (
-      <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Clientes" component={Clientes} />
-      </Drawer.Navigator>
-    );
+  const [active, setActive] = React.useState('');
+
+  return (
+    <Drawer.Section title="Some title">
+      <Drawer.Item
+        label="First Item"
+        active={active === 'first'}
+        onPress={() => setActive('first')}
+      />
+      <Drawer.Item
+        label="Second Item"
+        active={active === 'second'}
+        onPress={() => setActive('second')}
+      />
+    </Drawer.Section>
+  );
   }

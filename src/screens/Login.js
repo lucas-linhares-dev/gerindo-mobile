@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Snackbar } from 'react-native-paper';
+import { UsuarioActions } from '../actions/UsuarioActions';
+import { getUser, storeUser } from '../services/StorageUser';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -10,22 +12,14 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
 
-    const res = await fetch("http://192.168.1.69:3001/auth/usuarios/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          senha: senha
-        }),
-      });
-
-    // console.log(res)
+    // const res = UsuarioActions.Logar({email: email, senha: senha})
+    const res = await UsuarioActions.Logar({email: email, senha: senha})
 
     if (res.status === 200) {
+      const usuarioLogado = await res.json();
+      await storeUser(res)
       setSnackbarVisible(true);
-      setSnackbarMessage('Login successful');
+      setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
     } else {
       setSnackbarVisible(true);
       setSnackbarMessage('Login failed');

@@ -9,8 +9,10 @@ import  Home  from './src/screens/Home'
 import  Login  from './src/screens/Login'
 
 
+
 // import TelaPrincipal from './src/screens/TelaPrincipal';
 // import OutrasTelas from './src/screens/OutrasTelas';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -27,6 +29,7 @@ const theme = {
 }
 
 export default function Main() {
+
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer>

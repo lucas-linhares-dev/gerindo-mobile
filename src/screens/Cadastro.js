@@ -10,31 +10,51 @@ import SnackbarGeneric from '../components/SnackBar/SnackBarGeneric';
 import ButtonGeneric from '../components/Button/ButtonGeneric';
 
 
-const LoginScreen = () => {
+const CadastroScreen = () => {
 
-  const { control, handleSubmit, errors } = useForm();
+  const { control, handleSubmit, errors, getValues } = useForm();
   const navigation = useNavigation();
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarErrorVisible, setSnackbarErrorVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const onSubmit = async (data) => {
 
-    const res = await UsuarioActions.Logar(data)
+    if(data.senha !== data.confirmacaoSenha){
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("As senhas não correspondem");
+    }
+    else{
+      const res = await UsuarioActions.Cadastrar(data)
 
-    if (res.status === 200) {
-      const usuarioLogado = await res.json();
-      await storeUser(res)
-      setSnackbarVisible(true);
-      setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
-    } else {
-      setSnackbarVisible(true);
-      setSnackbarMessage('Falha ao fazer login');
+      if (res.status === 200) {
+        const usuarioLogado = await res.json();
+        await storeUser(res)
+        setSnackbarVisible(true);
+        setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
+      } else {
+        setSnackbarVisible(true);
+        setSnackbarMessage('Falha ao fazer login');
+      }
     }
   };
 
   return (
     <View style={styles.container}>
+      <SnackbarGeneric
+        visible={snackbarErrorVisible}
+        message={snackbarMessage}
+        setVisible={setSnackbarErrorVisible}
+        type={'erro'}
+      />
+      <TextFieldGeneric
+        control={control}
+        name="nome" 
+        label="Nome"
+        rules={{ required: 'Campo obrigatório' }} 
+        defaultValue="" 
+      />
       <TextFieldGeneric
         control={control}
         name="email" 
@@ -50,17 +70,24 @@ const LoginScreen = () => {
         rules={{ required: 'Campo obrigatório' }} 
         defaultValue="" 
       />
-
+      <TextFieldGeneric
+        control={control}
+        type={'password'}
+        name="confirmacaoSenha" 
+        label="Confirmação de senha"
+        rules={{ required: 'Campo obrigatório' }} 
+        defaultValue="" 
+      />
       <ButtonGeneric
         onPress={handleSubmit(onSubmit)}
-        title={'Entrar'}
+        title={'Cadastrar-se'}
       />
 
-      <Text variant="titleMedium" style={{marginVertical: 10, marginHorizontal: 108}}>Não tem cadastro?</Text>
+      <Text variant="titleMedium" style={{marginVertical: 10, marginHorizontal: 110}}>Já é cadastrado?</Text>
 
       <ButtonGeneric
-        onPress={() => navigation.navigate('Cadastro')}
-        title={'Cadastrar-se'}
+        onPress={() => navigation.navigate('Login')}
+        title={'Fazer login'}
         backgroundColor={'green'}
       />
       <SnackbarGeneric
@@ -69,7 +96,6 @@ const LoginScreen = () => {
         setVisible={setSnackbarVisible}
         onDismiss={() => navigation.navigate('Home')}
       />
-
     </View>
   );
 };
@@ -80,15 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  input: {
-    marginBottom: 16,
-  },
-  loginButton: {
-    backgroundColor: '#FFD900',
-  },
-  loginButtonContent: {
-    height: 50,
-  },
 });
 
-export default LoginScreen;
+export default CadastroScreen;

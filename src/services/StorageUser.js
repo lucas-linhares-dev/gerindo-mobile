@@ -17,5 +17,6 @@ export const getUser = async () => {
     return JSON.parse(usuario);
   } catch (error) {
     console.error('Erro ao recuperar informações do usuário:', error);
+    return null
   }
 };

@@ -8,9 +8,12 @@ import { useForm } from 'react-hook-form';
 import TextFieldGeneric from '../components/TextField/TextFieldGeneric';
 import SnackbarGeneric from '../components/SnackBar/SnackBarGeneric';
 import ButtonGeneric from '../components/Button/ButtonGeneric';
+import { useAuth } from '../providers/AuthProvider';
 
 
 const LoginScreen = () => {
+
+  const authContext = useAuth()
 
   const { control, handleSubmit, errors } = useForm();
   const navigation = useNavigation();
@@ -20,12 +23,14 @@ const LoginScreen = () => {
 
   const onSubmit = async (data) => {
 
-    const res = await UsuarioActions.Logar(data)
+    const res = await authContext.login(data);
 
     if (res.status === 200) {
       const usuarioLogado = await res.json();
-      await storeUser(res)
+      await storeUser(usuarioLogado)
+      console.log(usuarioLogado)
       setSnackbarVisible(true);
+      console.log(authContext.isAuthenticated)
       setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
     } else {
       setSnackbarVisible(true);
@@ -67,7 +72,9 @@ const LoginScreen = () => {
         visible={snackbarVisible}
         message={snackbarMessage}
         setVisible={setSnackbarVisible}
-        onDismiss={() => navigation.navigate('Home')}
+        onDismiss={() => {
+
+        }}
       />
 
     </View>

@@ -4,6 +4,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AuthProvider } from './src/providers/AuthProvider'; // Importe o contexto de autenticação
 import Main from './Main';
+import { ClienteProvider } from './src/providers/ClienteProvider';
+import { FormaPagProvider } from './src/providers/FormaPagProvider';
 
 const theme = {
   ...DefaultTheme,
@@ -21,15 +23,21 @@ export default function App() {
   const methods = useForm();
 
   return (
-    <AuthProvider>
-      <FormProvider {...methods}>
-        <PaperProvider theme={theme}>
-          <NavigationContainer>
-            <Main />
-          </NavigationContainer>
-        </PaperProvider>
-      </FormProvider>
-    </AuthProvider>
+    <FormaPagProvider>
+      <ClienteProvider>
+        <AuthProvider>
+          <FormProvider {...methods}>
+            <PaperProvider theme={theme}>
+              <NavigationContainer>
+                <Main />
+              </NavigationContainer>
+            </PaperProvider>
+          </FormProvider>
+        </AuthProvider>
+      </ClienteProvider>
+    </FormaPagProvider>
+
+
   );
 }
 

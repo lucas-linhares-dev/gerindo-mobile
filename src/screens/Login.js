@@ -9,17 +9,28 @@ import TextFieldGeneric from '../components/TextField/TextFieldGeneric';
 import SnackbarGeneric from '../components/SnackBar/SnackBarGeneric';
 import ButtonGeneric from '../components/Button/ButtonGeneric';
 import { useAuth } from '../providers/AuthProvider';
+import AutocompleteGeneric from '../components/AutoComplete/AutoCompleteGeneric';
+import { useCliente } from '../providers/ClienteProvider';
+import SelectGeneric from '../components/Select/SelectGeneric';
+import { useFormaPag } from '../providers/FormaPagProvider';
+import MyDateTimePicker from '../components/DateTimePicker/DateTimePicker';
+
 
 
 const LoginScreen = () => {
 
   const authContext = useAuth()
+  const clientes = useCliente()
+  const formasPag = useFormaPag()
+
 
   const { control, handleSubmit, errors } = useForm();
   const navigation = useNavigation();
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [autocompleteValue, setAutocompleteValue] = useState(''); // Adicione o estado local para o valor do Autocomplete
+
 
   const onSubmit = async (data) => {
 
@@ -40,20 +51,44 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      
+      <MyDateTimePicker />
+
       <TextFieldGeneric
         control={control}
-        name="email" 
+        name="email"
         label="Email"
-        rules={{ required: 'Campo obrigatório' }} 
-        defaultValue="" 
+        rules={{ required: 'Campo obrigatório' }}
+        defaultValue=""
       />
       <TextFieldGeneric
         control={control}
         type={'password'}
-        name="senha" 
+        name="senha"
         label="Senha"
-        rules={{ required: 'Campo obrigatório' }} 
-        defaultValue="" 
+        rules={{ required: 'Campo obrigatório' }}
+        defaultValue=""
+      />
+      <TextFieldGeneric
+        control={control}
+        type={'date'}
+        name="data"
+        label="Data"
+        rules={{ required: 'Campo obrigatório' }}
+        defaultValue=""
+      />
+      <AutocompleteGeneric
+        label={"Cliente"}
+        fieldExtractor={(cliente) => cliente.nome}
+        data={clientes.clientes}
+        onValueChange={(value) => setAutocompleteValue(value)}
+      />
+
+      <SelectGeneric
+        label={"Forma de pagamento"}
+        fieldExtractor={(formapag) => formapag.nome}
+        data={formasPag.formasPag}
+        onValueChange={(value) => setAutocompleteValue(value)}
       />
 
       <ButtonGeneric
@@ -61,7 +96,7 @@ const LoginScreen = () => {
         title={'Entrar'}
       />
 
-      <Text variant="titleMedium" style={{marginVertical: 10, marginHorizontal: 108}}>Não tem cadastro?</Text>
+      <Text variant="titleMedium" style={{ marginVertical: 10, marginHorizontal: 108 }}>Não tem cadastro?</Text>
 
       <ButtonGeneric
         onPress={() => navigation.navigate('Cadastro')}

@@ -20,16 +20,12 @@ import MyDateTimePicker from '../components/DateTimePicker/DateTimePicker';
 const LoginScreen = () => {
 
   const authContext = useAuth()
-  const clientes = useCliente()
-  const formasPag = useFormaPag()
-
 
   const { control, handleSubmit, errors } = useForm();
   const navigation = useNavigation();
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [autocompleteValue, setAutocompleteValue] = useState(''); // Adicione o estado local para o valor do Autocomplete
 
 
   const onSubmit = async (data) => {
@@ -52,8 +48,6 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       
-      <MyDateTimePicker />
-
       <TextFieldGeneric
         control={control}
         name="email"
@@ -68,27 +62,6 @@ const LoginScreen = () => {
         label="Senha"
         rules={{ required: 'Campo obrigatório' }}
         defaultValue=""
-      />
-      <TextFieldGeneric
-        control={control}
-        type={'date'}
-        name="data"
-        label="Data"
-        rules={{ required: 'Campo obrigatório' }}
-        defaultValue=""
-      />
-      <AutocompleteGeneric
-        label={"Cliente"}
-        fieldExtractor={(cliente) => cliente.nome}
-        data={clientes.clientes}
-        onValueChange={(value) => setAutocompleteValue(value)}
-      />
-
-      <SelectGeneric
-        label={"Forma de pagamento"}
-        fieldExtractor={(formapag) => formapag.nome}
-        data={formasPag.formasPag}
-        onValueChange={(value) => setAutocompleteValue(value)}
       />
 
       <ButtonGeneric

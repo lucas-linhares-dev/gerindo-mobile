@@ -65,7 +65,7 @@ const SelectGeneric = ({ label, data, fieldExtractor }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 30,
+    marginBottom: 30,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     marginLeft: 10,
+    backgroundColor: 'blue'
   },
   item: {
     borderBottomWidth: 1,

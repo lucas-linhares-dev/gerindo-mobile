@@ -14,7 +14,7 @@ const TextFieldGeneric = ({ control, name, label, rules, defaultValue, type }) =
             label={label}
             value={field.value}
             onBlur={field.onBlur}
-            onChangeText={(text) => field.onChange(text) }
+            onChangeText={(text) => field.onChange(text)}
             style={styles.input}
             secureTextEntry = {type === 'password'}
             // mode='outlined'

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { TextInput, List, IconButton, Button } from 'react-native-paper';
 
-const Autocomplete = ({ label, data, fieldExtractor }) => {
+const AutocompleteGeneric = ({ label, data, fieldExtractor }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -103,7 +103,7 @@ const Autocomplete = ({ label, data, fieldExtractor }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 30,
+    marginBottom: 30,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     marginLeft: 10,
+    backgroundColor: 'blue'
   },
   item: {
     borderBottomWidth: 1,
@@ -135,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Autocomplete;
+export default AutocompleteGeneric;

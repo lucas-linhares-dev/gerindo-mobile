@@ -40,5 +40,3 @@ export default function App() {
 
   );
 }
-
-// Não inclua o AppRegistry.registerComponent neste arquivo, pois ele não é mais necessário.

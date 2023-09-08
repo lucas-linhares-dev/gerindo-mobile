@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     alignItems: 'center',
+    marginBottom: 50,
   },
   rowContainer: {
     flexDirection: 'row',

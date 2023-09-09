@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Snackbar, Text } from 'react-native-paper';
+import { TextInput, Button, Snackbar, Text, Card } from 'react-native-paper';
 import { UsuarioActions } from '../actions/UsuarioActions';
 import { storeUser } from '../services/StorageUser';
 import { useNavigation } from '@react-navigation/native';
@@ -17,8 +17,8 @@ import { useEffect } from 'react';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProdutoActions } from '../actions/ProdutoActions';
-
-
+import Modal from 'react-native-modal';
+import Base64Image from '../components/helpers/Base64Image';
 
 
 const Venda = () => {
@@ -41,6 +41,11 @@ const Venda = () => {
   const [scanned, setScanned] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
 
+  const [produto, setProduto] = useState(null)
+  const [quantidade, setQuantidade] = useState(1)
+
+
+  const [modal, setModal] = useState(false)
 
 
   useEffect(() => {
@@ -52,25 +57,51 @@ const Venda = () => {
 
   const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
-    setCameraOpen(!cameraOpen);
-    
+
     const res = await ProdutoActions.GetWithCode(data.toString())
-    if(res.status === 200){
-      const produto = await res.json()
-      console.log(produto.nome)
-    } 
-    else{
+    if (res.status === 200) {
+      const produtoEncontrado = await res.json()
+      setProduto(produtoEncontrado)
+      setModal(true)
+      setCameraOpen(false);
+    }
+    else {
       console.log("PRODUTO NAO ENCONTRADO!")
     }
 
   };
 
-  const toggleCamera = () => {
-    setCameraOpen(!cameraOpen);
-    if (!cameraOpen) {
-      setScanned(false);
+  const closeModal = () => {
+    setModal(false)
+  }
+
+  const cancelarProduto = () => {
+    closeModal()
+    setCameraOpen(true)
+    setScanned(false);
+    setProduto(null)
+    setQuantidade(1)
+  }
+
+  const finalizarProdutos = () => {
+    const newProduto = {
+      produto: produto,
+      quantidade: quantidade
     }
-  };
+    const newProdutos = produtos.concat(newProduto)
+    setProdutos(newProdutos)
+    closeModal()
+  }
+
+  const continuarProdutos = () => {
+    const newProduto = {
+      produto: produto,
+      quantidade: quantidade
+    }
+    const newProdutos = produtos.concat(newProduto)
+    setProdutos(newProdutos)
+    cancelarProduto()
+  }
 
   const onSubmit = async (data) => {
     console.log(formaPag)
@@ -96,19 +127,18 @@ const Venda = () => {
     // }
   };
 
-
-
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
 
       {cameraOpen &&
         <SafeAreaView style={styles.containerCamera}>
           <BarCodeScanner
             onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
-          />            
+          />
           <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
             <Button mode="text" style={{ position: 'absolute', bottom: 20, left: 20 }} onPress={() => {
+              cancelarProduto()
               setCameraOpen(false)
             }}>
               <Text>Fechar</Text>
@@ -147,8 +177,8 @@ const Venda = () => {
           />
 
           <ButtonGeneric
-            title={cameraOpen ? 'Fechar câmera' : 'Iniciar scanner'}
-            onPress={() => toggleCamera()}
+            title={'Iniciar scanner'}
+            onPress={() => cancelarProduto()}
             backgroundColor={'green'}
           />
 
@@ -174,6 +204,39 @@ const Venda = () => {
 
       }
 
+      <Modal
+        isVisible={modal}
+        onBackdropPress={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View>
+            <Card>
+              <Card.Content style={styles.cardContent}>
+                <Base64Image base64ImageData={produto?.foto} width={250} height={200} />
+                <Text style={styles.title}>{produto?.nome}</Text>
+
+              </Card.Content>
+            </Card>
+          </View>
+        </View>
+        <View style={styles.inputQuantidade}>
+          <TextInput
+            label="Quantidade"
+            type='number'
+            value={quantidade} // Certifique-se de que 'quantidade' seja um estado
+            onChangeText={(text) => setQuantidade(text)} // Atualize o estado da quantidade
+            keyboardType="numeric" // Teclado numérico para entrada
+            style={{ width: 115, height: 80, textAlign: 'center' }}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <ButtonGeneric onPress={cancelarProduto} title={"Cancelar"} backgroundColor={'red'} />
+          <ButtonGeneric onPress={finalizarProdutos} title={"Finalizar"}/>
+          <ButtonGeneric onPress={continuarProdutos} title={"Continuar"} backgroundColor={'green'} />
+        </View>
+      </Modal>
+
+
     </View >
 
   );
@@ -189,6 +252,40 @@ const styles = StyleSheet.create({
   containerCamera: {
     flex: 1,
     justifyContent: 'center'
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 25,
+  },
+  cardContent: {
+    alignItems: 'center',
+    // backgroundColor: 'blue',
+    borderRadius: 5,
+    width: 270,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+  },
+  title: {
+    fontSize: 24,
+    marginTop: 20, // Espaço entre o título e a imagem
+  },
+
+  actions: {
+    justifyContent: 'center',
+  },
+  inputQuantidade: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20, // Espaço entre o campo de entrada e o botão
+    borderRadius: 20,
+
+  },
+  buttonContainer: {
+    flexDirection: 'row', // Define o layout como uma linha horizontal
+    justifyContent: 'space-between', // Distribui os botões uniformemente no espaço disponível
+    marginTop: 20, // Define a margem superior conforme necessário
   },
 });
 

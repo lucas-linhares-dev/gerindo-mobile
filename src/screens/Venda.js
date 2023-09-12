@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { TextInput, Button, Snackbar, Text, Card } from 'react-native-paper';
 import { UsuarioActions } from '../actions/UsuarioActions';
 import { storeUser } from '../services/StorageUser';
@@ -19,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProdutoActions } from '../actions/ProdutoActions';
 import Modal from 'react-native-modal';
 import Base64Image from '../components/helpers/Base64Image';
+import NumberInput from '../components/TextField/NumberInput';
 
 
 const Venda = () => {
@@ -200,8 +201,27 @@ const Venda = () => {
             setVisible={setSnackbarErrorVisible}
             type={'erro'}
           />
-        </View>
 
+          {produtos && (
+            <FlatList
+              data={produtos}
+              keyExtractor={(produto) => produto?.produto._id}
+              renderItem={({ item }) => (
+                <View style={styles.produtoContainer}>
+                  <Base64Image
+                    base64ImageData={item?.produto.foto}
+                    width={50}
+                    height={50}
+                  />
+                  <Text style={styles.produtoNome}>{item?.produto.nome}</Text>
+                  <Text style={styles.produtoQuantidade}>Quantidade: {item?.quantidade}</Text>
+                </View>
+              )}
+            />
+          )}
+
+
+        </View>
       }
 
       <Modal
@@ -220,18 +240,24 @@ const Venda = () => {
           </View>
         </View>
         <View style={styles.inputQuantidade}>
-          <TextInput
+          {/* <TextInput
             label="Quantidade"
-            type='number'
+            type="number"
             value={quantidade} // Certifique-se de que 'quantidade' seja um estado
             onChangeText={(text) => setQuantidade(text)} // Atualize o estado da quantidade
             keyboardType="numeric" // Teclado numérico para entrada
+            style={{ width: 115, height: 80, textAlign: 'center' }}
+          /> */}
+          <NumberInput
+            label="Quantidade"
+            value={quantidade}
+            onChangeText={(newValue) => setQuantidade(newValue)}
             style={{ width: 115, height: 80, textAlign: 'center' }}
           />
         </View>
         <View style={styles.buttonContainer}>
           <ButtonGeneric onPress={cancelarProduto} title={"Cancelar"} backgroundColor={'red'} />
-          <ButtonGeneric onPress={finalizarProdutos} title={"Finalizar"}/>
+          <ButtonGeneric onPress={finalizarProdutos} title={"Finalizar"} />
           <ButtonGeneric onPress={continuarProdutos} title={"Continuar"} backgroundColor={'green'} />
         </View>
       </Modal>
@@ -286,6 +312,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Define o layout como uma linha horizontal
     justifyContent: 'space-between', // Distribui os botões uniformemente no espaço disponível
     marginTop: 20, // Define a margem superior conforme necessário
+  },
+  produtoContainer: {
+    flexDirection: 'row', // Para alinhar os elementos horizontalmente
+    alignItems: 'center', // Para alinhar os elementos verticalmente ao centro
+    marginBottom: 10, // Espaçamento inferior entre os produtos
+  },
+  produtoNome: {
+    marginLeft: 10, // Espaçamento à esquerda do nome do produto
+    fontSize: 16, // Tamanho da fonte do nome do produto
+  },
+  produtoQuantidade: {
+    marginLeft: 10, // Espaçamento à esquerda da quantidade do produto
+    fontSize: 14, // Tamanho da fonte da quantidade do produto
+    color: 'gray', // Cor do texto da quantidade
   },
 });
 

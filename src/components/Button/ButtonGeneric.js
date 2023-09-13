@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
-const ButtonGeneric = ({ onPress, title, backgroundColor }) => {
+const ButtonGeneric = ({ onPress, title, backgroundColor, icon }) => {
 
     const styles = StyleSheet.create({
         loginButton: {
@@ -20,6 +20,8 @@ const ButtonGeneric = ({ onPress, title, backgroundColor }) => {
             onPress={onPress}
             style={styles.loginButton}
             contentStyle={styles.loginButtonContent}
+            icon={() => icon}
+            
         >
             {title}
         </Button>

@@ -20,6 +20,8 @@ import { ProdutoActions } from '../actions/ProdutoActions';
 import Modal from 'react-native-modal';
 import Base64Image from '../components/helpers/Base64Image';
 import NumberInput from '../components/TextField/NumberInput';
+import { AntDesign } from '@expo/vector-icons';
+
 
 
 const Venda = () => {
@@ -163,30 +165,29 @@ const Venda = () => {
 
           <MyDateTimePicker />
 
-          <AutocompleteGeneric
-            label={"Cliente"}
-            fieldExtractor={(cliente) => cliente.nome}
-            data={clientes.clientes}
-            onValueChange={(value) => setCliente(value)}
-          />
+          <Card style={styles.cardInformacoes}>
+              <Text style={styles.titleInformacoes}>Informações da venda</Text>
+              <AutocompleteGeneric
+                label={"Cliente"}
+                fieldExtractor={(cliente) => cliente.nome}
+                data={clientes.clientes}
+                onValueChange={(value) => setCliente(value)}
+              />
 
-          <SelectGeneric
-            label={"Forma de pagamento"}
-            fieldExtractor={(formapag) => formapag.nome}
-            data={formasPag.formasPag}
-            onValueChange={(value) => setFormaPag(value)}
-          />
+              <SelectGeneric
+                label={"Forma de pagamento"}
+                fieldExtractor={(formapag) => formapag.nome}
+                data={formasPag.formasPag}
+                onValueChange={(value) => setFormaPag(value)}
+              />
+          </Card>
+
 
           <ButtonGeneric
-            title={'Iniciar scanner'}
+            title={'Scannear'}
             onPress={() => cancelarProduto()}
-            backgroundColor={'green'}
-          />
-
-          <ButtonGeneric
-            onPress={() => navigation.navigate('Login')}
-            title={'Confirmar venda'}
-            backgroundColor={'green'}
+            backgroundColor={'blue'}
+            icon={<AntDesign name="camera" size={24} color="white" />} // Passe o ícone como um componente
           />
 
           <SnackbarGeneric
@@ -220,7 +221,11 @@ const Venda = () => {
             />
           )}
 
-
+          <ButtonGeneric
+            onPress={() => navigation.navigate('Login')}
+            title={'Confirmar venda'}
+            backgroundColor={'green'}
+          />
         </View>
       }
 
@@ -327,6 +332,13 @@ const styles = StyleSheet.create({
     fontSize: 14, // Tamanho da fonte da quantidade do produto
     color: 'gray', // Cor do texto da quantidade
   },
+  cardInformacoes:{
+    padding: 20,
+  },
+  titleInformacoes:{
+    marginBottom: 20,
+    fontSize: 30,
+  }
 });
 
 export default Venda;

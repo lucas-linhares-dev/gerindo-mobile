@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
 import { TextInput, Button, Snackbar, Text, Card } from 'react-native-paper';
 import { UsuarioActions } from '../actions/UsuarioActions';
 import { storeUser } from '../services/StorageUser';
@@ -161,12 +161,16 @@ const Venda = () => {
       }
 
       {!cameraOpen &&
-        <View style={styles.container}>
+        <ScrollView style={{ flex: 1 }}>
 
-          <MyDateTimePicker />
+          <View style={styles.container}>
 
-          <Card style={styles.cardInformacoes}>
-              <Text style={styles.titleInformacoes}>Informações da venda</Text>
+            <MyDateTimePicker />
+
+            <Card style={styles.cardInformacoes}>
+              <View style={{ borderBotto: 'solid 1px yellow' }}>
+                <Text style={styles.titleInformacoes}>Informações da venda</Text>
+              </View>
               <AutocompleteGeneric
                 label={"Cliente"}
                 fieldExtractor={(cliente) => cliente.nome}
@@ -180,53 +184,61 @@ const Venda = () => {
                 data={formasPag.formasPag}
                 onValueChange={(value) => setFormaPag(value)}
               />
-          </Card>
+            </Card>
 
+            <Card style={styles.cardInformacoes}>
 
-          <ButtonGeneric
-            title={'Scannear'}
-            onPress={() => cancelarProduto()}
-            backgroundColor={'blue'}
-            icon={<AntDesign name="camera" size={24} color="white" />} // Passe o ícone como um componente
-          />
+              <SnackbarGeneric
+                visible={snackbarVisible}
+                message={snackbarMessage}
+                setVisible={setSnackbarVisible}
+                onDismiss={() => navigation.navigate('Home')}
+              />
+              <SnackbarGeneric
+                visible={snackbarErrorVisible}
+                message={snackbarMessage}
+                setVisible={setSnackbarErrorVisible}
+                type={'erro'}
+              />
+              <Text style={styles.titleInformacoes}>Produtos</Text>
 
-          <SnackbarGeneric
-            visible={snackbarVisible}
-            message={snackbarMessage}
-            setVisible={setSnackbarVisible}
-            onDismiss={() => navigation.navigate('Home')}
-          />
-          <SnackbarGeneric
-            visible={snackbarErrorVisible}
-            message={snackbarMessage}
-            setVisible={setSnackbarErrorVisible}
-            type={'erro'}
-          />
-
-          {produtos && (
-            <FlatList
-              data={produtos}
-              keyExtractor={(produto) => produto?.produto._id}
-              renderItem={({ item }) => (
-                <View style={styles.produtoContainer}>
-                  <Base64Image
-                    base64ImageData={item?.produto.foto}
-                    width={50}
-                    height={50}
-                  />
-                  <Text style={styles.produtoNome}>{item?.produto.nome}</Text>
-                  <Text style={styles.produtoQuantidade}>Quantidade: {item?.quantidade}</Text>
-                </View>
+              {produtos && (
+                <FlatList
+                  data={produtos}
+                  keyExtractor={(produto) => produto?.produto._id}
+                  renderItem={({ item }) => (
+                    <View style={styles.produtoContainer}>
+                      <Base64Image
+                        base64ImageData={item?.produto.foto}
+                        width={50}
+                        height={50}
+                      />
+                      <Text style={styles.produtoNome}>{item?.produto.nome}</Text>
+                      <Text style={styles.produtoQuantidade}>Quantidade: {item?.quantidade}</Text>
+                    </View>
+                  )}
+                />
               )}
-            />
-          )}
 
-          <ButtonGeneric
-            onPress={() => navigation.navigate('Login')}
-            title={'Confirmar venda'}
-            backgroundColor={'green'}
-          />
-        </View>
+              <ButtonGeneric
+                marginTop={20}
+                title={'Scannear'}
+                onPress={() => cancelarProduto()}
+                backgroundColor={'blue'}
+                icon={<AntDesign name="camera" size={24} color="white" />} // Passe o ícone como um componente
+              />
+            </Card>
+
+
+
+            <ButtonGeneric
+              onPress={() => navigation.navigate('Login')}
+              title={'Confirmar venda'}
+              backgroundColor={'green'}
+            />
+          </View>
+        </ScrollView>
+
       }
 
       <Modal
@@ -321,7 +333,7 @@ const styles = StyleSheet.create({
   produtoContainer: {
     flexDirection: 'row', // Para alinhar os elementos horizontalmente
     alignItems: 'center', // Para alinhar os elementos verticalmente ao centro
-    marginBottom: 10, // Espaçamento inferior entre os produtos
+    marginBottom: 20, // Espaçamento inferior entre os produtos
   },
   produtoNome: {
     marginLeft: 10, // Espaçamento à esquerda do nome do produto
@@ -332,12 +344,14 @@ const styles = StyleSheet.create({
     fontSize: 14, // Tamanho da fonte da quantidade do produto
     color: 'gray', // Cor do texto da quantidade
   },
-  cardInformacoes:{
+  cardInformacoes: {
     padding: 20,
+    backgroundColor: '#98FB98',
+    marginBottom: 20
   },
-  titleInformacoes:{
+  titleInformacoes: {
     marginBottom: 20,
-    fontSize: 30,
+    fontSize: 20,
   }
 });
 

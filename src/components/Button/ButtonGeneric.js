@@ -2,12 +2,13 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
-const ButtonGeneric = ({ onPress, title, backgroundColor, icon }) => {
+const ButtonGeneric = ({ onPress, title, backgroundColor, icon, marginTop }) => {
 
     const styles = StyleSheet.create({
         loginButton: {
             backgroundColor: backgroundColor || '#2196F3',
-            marginBottom: 10
+            marginBottom: 0,
+            marginTop: marginTop || null
         },
         loginButtonContent: {
             height: 50,

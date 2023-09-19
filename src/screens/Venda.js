@@ -21,7 +21,8 @@ import Modal from 'react-native-modal';
 import Base64Image from '../components/helpers/Base64Image';
 import NumberInput from '../components/TextField/NumberInput';
 import { AntDesign } from '@expo/vector-icons';
-
+import DecimalInput from '../components/TextField/DecimalInput';
+import { decimalDigitsMask } from '../helpers/decimalDigitsMask';
 
 
 const Venda = () => {
@@ -39,6 +40,7 @@ const Venda = () => {
   const [cliente, setCliente] = useState('');
   const [data, setData] = useState('')
   const [produtos, setProdutos] = useState([])
+  const [valorTotal, setValorTotal] = useState('0,00')
 
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -130,6 +132,19 @@ const Venda = () => {
     // }
   };
 
+
+  useEffect(() => {
+    let vlrTotalVenda = 0
+    produtos.forEach((produto) => {
+        let preco_venda_format = produto.produto.preco_venda.slice(0, produto.produto.preco_venda.length - 3);
+        preco_venda_format = parseFloat(preco_venda_format)
+        let vlrTotalProduto = preco_venda_format * produto.quantidade
+        vlrTotalVenda += vlrTotalProduto
+    });
+    console.log(vlrTotalVenda)
+    setValorTotal(decimalDigitsMask((vlrTotalVenda * 100).toString(), 2))
+}, [produtos])
+
   return (
     <View style={{ flex: 1 }}>
 
@@ -184,6 +199,20 @@ const Venda = () => {
                 data={formasPag.formasPag}
                 onValueChange={(value) => setFormaPag(value)}
               />
+
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ fontSize: 20, marginRight: 10 }}>Valor total:</Text>
+
+                <TextInput
+                  value={valorTotal}
+                  onChangeText={(text) => {
+                    setValorTotal(decimalDigitsMask(text, 2))
+                  }}
+                  keyboardType="numeric"
+                />
+
+              </View>
+
             </Card>
 
             <Card style={styles.cardInformacoes}>

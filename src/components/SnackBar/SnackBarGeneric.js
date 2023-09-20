@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Snackbar, Text } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { Modal, Snackbar, Text } from 'react-native-paper';
 
-const SnackbarGeneric = ({ message, duration = 2000, onDismiss, visible, setVisible, type }) => {
+const SnackbarGeneric = ({ message, duration = 2000, onDismiss, visible, setVisible, type, position }) => {
 
   const styles = StyleSheet.create({
+    container: {
+      position: 'absolute',
+      left: 10,
+      right: 20,
+      bottom: position === 'bottom' ? 0 : undefined, // Define a posição inferior se position for 'bottom'
+      top: position === 'top' ? 50 : undefined, // Define a posição superior se position for 'top'
+    },
     snackbar: {
       backgroundColor: type === 'erro' ? 'red' : '#2196F3',
       borderRadius: 8,
-      // width: '100%'
+      width: '100%',
     },
     snackbarText: {
-      color: 'white', // Cor do texto
+      color: 'white',
       fontSize: 16,
     },
   });
@@ -22,19 +29,17 @@ const SnackbarGeneric = ({ message, duration = 2000, onDismiss, visible, setVisi
   };
 
   return (
-    <Snackbar
-      visible={visible}
-      onDismiss={hideSnackbar}
-      duration={duration}
-      style={styles.snackbar}
-    >
-      <Text style={styles.snackbarText}>{message}</Text>
-    </Snackbar>
-
+    <View style={styles.container}>
+        <Snackbar
+          visible={visible}
+          onDismiss={hideSnackbar}
+          duration={duration}
+          style={styles.snackbar}
+        >
+          <Text style={styles.snackbarText}>{message}</Text>
+        </Snackbar>
+    </View>
   );
-
 };
-
-
 
 export default SnackbarGeneric;

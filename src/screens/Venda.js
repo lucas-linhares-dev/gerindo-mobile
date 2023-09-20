@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Snackbar, Text, Card } from 'react-native-paper';
 import { UsuarioActions } from '../actions/UsuarioActions';
 import { storeUser } from '../services/StorageUser';
@@ -23,6 +23,8 @@ import NumberInput from '../components/TextField/NumberInput';
 import { AntDesign } from '@expo/vector-icons';
 import DecimalInput from '../components/TextField/DecimalInput';
 import { decimalDigitsMask } from '../helpers/decimalDigitsMask';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 
 const Venda = () => {
@@ -48,6 +50,8 @@ const Venda = () => {
 
   const [produto, setProduto] = useState(null)
   const [quantidade, setQuantidade] = useState(1)
+
+  const [quantidadesFinais, setQuantidadesFinais] = useState([])
 
 
   const [modal, setModal] = useState(false)
@@ -93,19 +97,38 @@ const Venda = () => {
       produto: produto,
       quantidade: quantidade
     }
-    const newProdutos = produtos.concat(newProduto)
-    setProdutos(newProdutos)
-    closeModal()
+
+    const produtoJaExiste = produtos.some((item) => item.produto._id === newProduto.produto._id);
+
+    if (!produtoJaExiste) {
+      setProdutos([...produtos, newProduto]);
+      setQuantidadesFinais([...quantidadesFinais, quantidade]);
+      closeModal();
+    }
+    else {
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("Esse produto já foi inserido na venda");
+    }
   }
+
 
   const continuarProdutos = () => {
     const newProduto = {
       produto: produto,
       quantidade: quantidade
     }
-    const newProdutos = produtos.concat(newProduto)
-    setProdutos(newProdutos)
-    cancelarProduto()
+
+    const produtoJaExiste = produtos.some((item) => item.produto._id === newProduto.produto._id);
+
+    if (!produtoJaExiste) {
+      setProdutos([...produtos, newProduto]);
+      setQuantidadesFinais([...quantidadesFinais, quantidade]);
+      cancelarProduto()
+    }
+    else {
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("Esse produto já foi inserido na venda");
+    }
   }
 
   const onSubmit = async (data) => {
@@ -135,21 +158,25 @@ const Venda = () => {
 
   useEffect(() => {
     let vlrTotalVenda = 0
-    produtos.forEach((produto) => {
-        let preco_venda_format = produto.produto.preco_venda.slice(0, produto.produto.preco_venda.length - 3);
-        preco_venda_format = parseFloat(preco_venda_format)
-        let vlrTotalProduto = preco_venda_format * produto.quantidade
-        vlrTotalVenda += vlrTotalProduto
+    produtos.forEach((produto, index) => {
+      let preco_venda_format = produto.produto.preco_venda.slice(0, produto.produto.preco_venda.length - 3);
+      preco_venda_format = parseFloat(preco_venda_format)
+      let vlrTotalProduto = preco_venda_format * quantidadesFinais[index]
+      vlrTotalVenda += vlrTotalProduto
     });
     console.log(vlrTotalVenda)
     setValorTotal(decimalDigitsMask((vlrTotalVenda * 100).toString(), 2))
-}, [produtos])
+  }, [produtos, quantidadesFinais])
 
+  console.log(quantidadesFinais)
+  console.log(snackbarErrorVisible)
   return (
     <View style={{ flex: 1 }}>
 
       {cameraOpen &&
+
         <SafeAreaView style={styles.containerCamera}>
+
           <BarCodeScanner
             onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
@@ -223,30 +250,73 @@ const Venda = () => {
                 setVisible={setSnackbarVisible}
                 onDismiss={() => navigation.navigate('Home')}
               />
-              <SnackbarGeneric
-                visible={snackbarErrorVisible}
-                message={snackbarMessage}
-                setVisible={setSnackbarErrorVisible}
-                type={'erro'}
-              />
+
               <Text style={styles.titleInformacoes}>Produtos</Text>
 
               {produtos && (
-                <FlatList
-                  data={produtos}
-                  keyExtractor={(produto) => produto?.produto._id}
-                  renderItem={({ item }) => (
-                    <View style={styles.produtoContainer}>
+                <View>
+                  {produtos.map((item, index) => (
+                    <View style={styles.produtoContainer} key={item?.produto._id}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const newProdutos = [...produtos];
+                          const newQuantidadesFinais = [...quantidadesFinais];
+                          newProdutos.splice(index, 1);
+                          newQuantidadesFinais.splice(index, 1);
+                          setProdutos(newProdutos);
+                          setQuantidadesFinais(newQuantidadesFinais);
+                        }}
+                      >
+                        <Icon name="times" size={23} color="red" style={{ marginRight: 15 }} />
+                      </TouchableOpacity>
                       <Base64Image
                         base64ImageData={item?.produto.foto}
                         width={50}
                         height={50}
                       />
                       <Text style={styles.produtoNome}>{item?.produto.nome}</Text>
-                      <Text style={styles.produtoQuantidade}>Quantidade: {item?.quantidade}</Text>
+                      <View style={styles.quantidadeContainer}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            const newQuantidadesFinais = [...quantidadesFinais];
+                            if (parseInt(newQuantidadesFinais[index]) - 1 === 0) {
+                              return
+                            }
+                            newQuantidadesFinais[index] = parseInt(newQuantidadesFinais[index]) - 1;
+                            setQuantidadesFinais(newQuantidadesFinais);
+                          }}
+                        >
+                          <Icon name="minus" size={23} color="black" />
+                        </TouchableOpacity>
+                        <View style={styles.produtoQuantidade}>
+                          <NumberInput
+                            label="Quantidade"
+                            value={quantidadesFinais[index]}
+                            onChangeText={(newValue) => {
+                              const newQuantidadesFinais = [...quantidadesFinais];
+                              if (newValue) {
+                                newQuantidadesFinais[index] = parseInt(newValue);
+                              } else {
+                                newQuantidadesFinais[index] = '';
+                              }
+                              setQuantidadesFinais(newQuantidadesFinais);
+                            }}
+                          />
+                        </View>
+                        <TouchableOpacity
+                          onPress={() => {
+                            const newQuantidadesFinais = [...quantidadesFinais];
+                            newQuantidadesFinais[index] = parseInt(newQuantidadesFinais[index]) + 1;
+                            setQuantidadesFinais(newQuantidadesFinais);
+                          }}
+                        >
+                          <Icon name="plus" size={23} color="black" />
+                        </TouchableOpacity>
+                      </View>
                     </View>
-                  )}
-                />
+                  ))}
+                </View>
+
               )}
 
               <ButtonGeneric
@@ -274,6 +344,14 @@ const Venda = () => {
         isVisible={modal}
         onBackdropPress={closeModal}
       >
+        <SnackbarGeneric
+          visible={snackbarErrorVisible}
+          message={snackbarMessage}
+          setVisible={setSnackbarErrorVisible}
+          type={'erro'}
+          duration={2500}
+          position={'top'}
+        />
         <View style={styles.modalContainer}>
           <View>
             <Card>
@@ -307,6 +385,7 @@ const Venda = () => {
           <ButtonGeneric onPress={continuarProdutos} title={"Continuar"} backgroundColor={'green'} />
         </View>
       </Modal>
+
 
 
     </View >
@@ -366,11 +445,12 @@ const styles = StyleSheet.create({
   },
   produtoNome: {
     marginLeft: 10, // Espaçamento à esquerda do nome do produto
-    fontSize: 16, // Tamanho da fonte do nome do produto
+    fontSize: 18, // Tamanho da fonte do nome do produto
+    marginRight: 20
   },
   produtoQuantidade: {
-    marginLeft: 10, // Espaçamento à esquerda da quantidade do produto
-    fontSize: 14, // Tamanho da fonte da quantidade do produto
+    marginHorizontal: 10, // Espaçamento à esquerda da quantidade do produto
+    // fontSize: 16, // Tamanho da fonte da quantidade do produto
     color: 'gray', // Cor do texto da quantidade
   },
   cardInformacoes: {
@@ -381,6 +461,10 @@ const styles = StyleSheet.create({
   titleInformacoes: {
     marginBottom: 20,
     fontSize: 20,
+  },
+  quantidadeContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
   }
 });
 

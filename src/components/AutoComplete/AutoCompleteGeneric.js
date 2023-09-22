@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { TextInput, List, IconButton, Button } from 'react-native-paper';
 
-const AutocompleteGeneric = ({ label, data, fieldExtractor }) => {
-  const [query, setQuery] = useState('');
+const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 

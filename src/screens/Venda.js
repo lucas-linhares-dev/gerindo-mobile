@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Snackbar, Text, Card } from 'react-native-paper';
-import { UsuarioActions } from '../actions/UsuarioActions';
-import { storeUser } from '../services/StorageUser';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Text, Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { useForm } from 'react-hook-form';
-import TextFieldGeneric from '../components/TextField/TextFieldGeneric';
 import SnackbarGeneric from '../components/SnackBar/SnackBarGeneric';
 import ButtonGeneric from '../components/Button/ButtonGeneric';
 import { useCliente } from '../providers/ClienteProvider';
@@ -21,9 +17,9 @@ import Modal from 'react-native-modal';
 import Base64Image from '../components/helpers/Base64Image';
 import NumberInput from '../components/TextField/NumberInput';
 import { AntDesign } from '@expo/vector-icons';
-import DecimalInput from '../components/TextField/DecimalInput';
 import { decimalDigitsMask } from '../helpers/decimalDigitsMask';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { VendaActions } from '../actions/VendaActions';
 
 
 
@@ -40,7 +36,7 @@ const Venda = () => {
 
   const [formaPag, setFormaPag] = useState('');
   const [cliente, setCliente] = useState('');
-  const [data, setData] = useState('')
+  const [data, setData] = useState(new Date())
   const [produtos, setProdutos] = useState([])
   const [valorTotal, setValorTotal] = useState('0,00')
 
@@ -53,9 +49,7 @@ const Venda = () => {
 
   const [quantidadesFinais, setQuantidadesFinais] = useState([])
 
-
   const [modal, setModal] = useState(false)
-
 
   useEffect(() => {
     (async () => {
@@ -131,30 +125,68 @@ const Venda = () => {
     }
   }
 
-  const onSubmit = async (data) => {
-    console.log(formaPag)
+  const onSubmit = async () => {
+    console.log("SUBMIT")
     console.log(cliente)
-    console.log(data)
-    // console.log(produtos)
-    // if(data.senha !== data.confirmacaoSenha){
-    //   setSnackbarErrorVisible(true);
-    //   setSnackbarMessage("As senhas não correspondem");
-    // }
-    // else{
-    //   const res = await UsuarioActions.Cadastrar(data)
+    if(!cliente){
+      console.log("ERRO cliente")
 
-    //   if (res.status === 200) {
-    //     const usuarioLogado = await res.json();
-    //     await storeUser(res)
-    //     setSnackbarVisible(true);
-    //     setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
-    //   } else {
-    //     setSnackbarVisible(true);
-    //     setSnackbarMessage('Falha ao fazer login');
-    //   }
-    // }
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("Selecione o cliente da venda!");
+      return
+    }
+    if(!formaPag){
+      console.log("ERRO FORMAPAG")
+
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("Selecione a forma de pagamento da venda!");
+      return
+    }
+    if(produtos.length === 0){
+      console.log("ERRO PRODUTOS")
+      setSnackbarErrorVisible(true);
+      setSnackbarMessage("Insira o(s) produto(s) da venda!");
+      return
+    }
+
+    let produtosFinal = []
+
+    produtos.map((produto, index) => {
+      const newProduto = {
+        cod_ref: produto.produto._id,
+        nome: produto.produto.nome,
+        quantidade: parseInt(quantidadesFinais[index])
+      }
+      produtosFinal.push(newProduto)
+    })
+
+    console.log(produtosFinal)
+
+    const objVendaInsert = {
+      data: data,
+      cliente: cliente,
+      forma_pag: formaPag,
+      produtos: produtosFinal,
+      vlr_total: valorTotal
+    }
+
+    const res = await VendaActions.Insert(objVendaInsert)
+
+    console.log(res)
+
+    if(res.status === 200){
+      setSnackbarVisible(true)
+      setSnackbarMessage("Venda inserida com sucesso!")
+      setFormaPag('')
+      setCliente('')
+      setProdutos([])
+      setQuantidadesFinais([])
+    }
+    else{
+      setSnackbarErrorVisible(true)
+      setSnackbarMessage("DEU RUIM INSERIR A VENDA")
+    }
   };
-
 
   useEffect(() => {
     let vlrTotalVenda = 0
@@ -168,8 +200,6 @@ const Venda = () => {
     setValorTotal(decimalDigitsMask((vlrTotalVenda * 100).toString(), 2))
   }, [produtos, quantidadesFinais])
 
-  console.log(quantidadesFinais)
-  console.log(snackbarErrorVisible)
   return (
     <View style={{ flex: 1 }}>
 
@@ -188,16 +218,6 @@ const Venda = () => {
             }}>
               <Text>Fechar</Text>
             </Button>
-
-            {/* <TouchableOpacity style={{ position: 'absolute', bottom: 20, left: 20 }} onPress={() => {
-                setTypeCamera(
-                  typeCamera === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back
-                )
-              }}>
-                <Text style={{ fontSize: 20, marginBottom: 12, color: '#fff' }}>Trocar</Text>
-              </TouchableOpacity> */}
           </View>
         </SafeAreaView>
       }
@@ -207,7 +227,16 @@ const Venda = () => {
 
           <View style={styles.container}>
 
-            <MyDateTimePicker />
+          <SnackbarGeneric
+          visible={snackbarErrorVisible}
+          message={snackbarMessage}
+          setVisible={setSnackbarErrorVisible}
+          type={'erro'}
+          duration={2500}
+          position={'top'}
+        />
+
+            <MyDateTimePicker date={data} setDate={setData} />
 
             <Card style={styles.cardInformacoes}>
               <View style={{ borderBotto: 'solid 1px yellow' }}>
@@ -218,6 +247,8 @@ const Venda = () => {
                 fieldExtractor={(cliente) => cliente.nome}
                 data={clientes.clientes}
                 onValueChange={(value) => setCliente(value)}
+                query={cliente}
+                setQuery={setCliente}
               />
 
               <SelectGeneric
@@ -225,6 +256,8 @@ const Venda = () => {
                 fieldExtractor={(formapag) => formapag.nome}
                 data={formasPag.formasPag}
                 onValueChange={(value) => setFormaPag(value)}
+                query={formaPag}
+                setQuery={setFormaPag}
               />
 
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -331,7 +364,7 @@ const Venda = () => {
 
 
             <ButtonGeneric
-              onPress={() => navigation.navigate('Login')}
+              onPress={() => onSubmit()}
               title={'Confirmar venda'}
               backgroundColor={'green'}
             />
@@ -364,14 +397,6 @@ const Venda = () => {
           </View>
         </View>
         <View style={styles.inputQuantidade}>
-          {/* <TextInput
-            label="Quantidade"
-            type="number"
-            value={quantidade} // Certifique-se de que 'quantidade' seja um estado
-            onChangeText={(text) => setQuantidade(text)} // Atualize o estado da quantidade
-            keyboardType="numeric" // Teclado numérico para entrada
-            style={{ width: 115, height: 80, textAlign: 'center' }}
-          /> */}
           <NumberInput
             label="Quantidade"
             value={quantidade}
@@ -386,8 +411,6 @@ const Venda = () => {
         </View>
       </Modal>
 
-
-
     </View >
 
   );
@@ -397,7 +420,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 20,
-    // justifyContent: 'center',
     paddingHorizontal: 20,
   },
   containerCamera: {

@@ -5,7 +5,6 @@ import Home from './src/screens/Home';
 import CadastroScreen from './src/screens/Cadastro';
 import { useAuth } from './src/providers/AuthProvider';
 import LoginScreen from './src/screens/Login';
-import { IconButton } from 'react-native-paper';
 import Venda from './src/screens/Venda';
 
 const Drawer = createDrawerNavigator();
@@ -26,7 +25,7 @@ export default function Main() {
 
     return (
         <>
-            {true ? (
+            {authenticated ? (
                 <Drawer.Navigator initialRouteName="Home">
                     <Drawer.Screen name="Clientes" component={Clientes} />
                     <Drawer.Screen name="Home" component={Home} />

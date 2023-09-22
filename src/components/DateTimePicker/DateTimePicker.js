@@ -4,8 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-const MyDateTimePicker = () => {
-  const [date, setDate] = useState(new Date());
+const MyDateTimePicker = ({date, setDate}) => {
   const [show, setShow] = useState(false);
 
   const onChange = (event, selectedDate) => {

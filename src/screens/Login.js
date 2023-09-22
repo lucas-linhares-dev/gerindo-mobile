@@ -40,6 +40,7 @@ const LoginScreen = () => {
       console.log(authContext.isAuthenticated)
       setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
     } else {
+      const msgErro = await res
       setSnackbarVisible(true);
       setSnackbarMessage('Falha ao fazer login');
     }
@@ -79,6 +80,7 @@ const LoginScreen = () => {
       <SnackbarGeneric
         visible={snackbarVisible}
         message={snackbarMessage}
+        type={'erro'}
         setVisible={setSnackbarVisible}
         onDismiss={() => {
 

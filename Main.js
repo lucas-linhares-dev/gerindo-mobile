@@ -25,11 +25,26 @@ export default function Main() {
 
     return (
         <>
-            {authenticated ? (
-                <Drawer.Navigator initialRouteName="Home">
-                    <Drawer.Screen name="Clientes" component={Clientes} />
+            {true ? (
+                <Drawer.Navigator initialRouteName="Home"
+                screenOptions={{
+                    drawerStyle: {
+                      backgroundColor: 'green',
+                      width: 240,
+                    },
+                  }}
+                >
+                    <Drawer.Screen name="Clientes" component={Clientes}  />
                     <Drawer.Screen name="Home" component={Home} />
-                    <Drawer.Screen name="Venda" component={Venda} />
+                    <Drawer.Screen name="Venda" component={Venda}
+                    options={{
+                        title: 'Clientes', // Define o título da tela
+                        headerStyle: {
+                            backgroundColor: 'green', // Define a cor de fundo do cabeçalho
+                        },
+                        headerTintColor: 'white', // Define a cor do texto do cabeçalho
+                    }}
+                    />
 
                     {/* <Drawer.Screen
                         name="Logout"

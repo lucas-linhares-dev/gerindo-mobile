@@ -3,6 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Button } from 'react-native-paper';
 
 const MyDateTimePicker = ({date, setDate}) => {
   const [show, setShow] = useState(false);
@@ -16,12 +17,13 @@ const MyDateTimePicker = ({date, setDate}) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowContainer}>
-        <TouchableOpacity
+        <Button
           onPress={() => setShow(true)}
           style={styles.button}
+          mode='elevated'
         >
           <Text style={styles.buttonText}>Editar Data</Text>
-        </TouchableOpacity>
+        </Button>
         <View style={styles.dateContainer}>
           <Text style={styles.dateText}>
             {format(date, 'dd/MM/yyyy', { locale: ptBR })}
@@ -54,14 +56,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: 'blue',
-    padding: 8,
-    borderRadius: 8,
+    borderRadius: 5,
     marginRight: 8
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: 'green',
   },
   dateContainer: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
 import { TextInput, List, IconButton, Button } from 'react-native-paper';
 
 const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery }) => {
@@ -64,10 +64,11 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery }) =
           label={label}
           value={query}
           onChangeText={handleInputChange}
+          mode='outlined'
           style={styles.input}
         />
-        <Button mode="contained" onPress={openModal} style={styles.searchButton}>
-          Buscar
+        <Button mode="elevated" onPress={openModal} style={styles.searchButton}>
+          <Text style={{color: 'green'}}>Buscar</Text>
         </Button>
       </View>
       <Modal
@@ -111,11 +112,12 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
   },
   searchButton: {
     marginLeft: 10,
-    backgroundColor: 'blue'
+    // backgroundColor: 'green'
+    borderRadius: 5,
   },
   item: {
     borderBottomWidth: 1,

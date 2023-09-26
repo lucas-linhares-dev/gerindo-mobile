@@ -20,6 +20,8 @@ import { AntDesign } from '@expo/vector-icons';
 import { decimalDigitsMask } from '../helpers/decimalDigitsMask';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { VendaActions } from '../actions/VendaActions';
+import DialogConfirm from '../components/Dialog/DialogConfirm';
+import DialogMessage from '../components/Dialog/DialogMessage';
 
 
 
@@ -29,10 +31,6 @@ const Venda = () => {
   const formasPag = useFormaPag()
 
   const navigation = useNavigation();
-
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarErrorVisible, setSnackbarErrorVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [formaPag, setFormaPag] = useState('');
   const [cliente, setCliente] = useState('');
@@ -48,6 +46,11 @@ const Venda = () => {
   const [quantidade, setQuantidade] = useState(1)
 
   const [quantidadesFinais, setQuantidadesFinais] = useState([])
+
+  const [dialogConfirm, setDialogConfirm] = useState(false)
+  const [dialogMessageError, setDialogMessageError] = useState(false)
+  const [msgDialog, setMsgDialog] = useState()
+  const [dialogMessageSuccess, setDialogMessageSuccess] = useState(false)
 
   const [modal, setModal] = useState(false)
 
@@ -100,8 +103,8 @@ const Venda = () => {
       closeModal();
     }
     else {
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("Esse produto já foi inserido na venda");
+      setDialogMessageError(true);
+      setMsgDialog("Esse produto já foi inserido na venda");
     }
   }
 
@@ -120,32 +123,32 @@ const Venda = () => {
       cancelarProduto()
     }
     else {
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("Esse produto já foi inserido na venda");
+      setDialogMessageError(true);
+      setMsgDialog("Esse produto já foi inserido na venda");
     }
   }
 
   const onSubmit = async () => {
     console.log("SUBMIT")
     console.log(cliente)
-    if(!cliente){
+    if (!cliente) {
       console.log("ERRO cliente")
 
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("Selecione o cliente da venda!");
+      setDialogMessageError(true);
+      setMsgDialog("Selecione o cliente da venda!");
       return
     }
-    if(!formaPag){
+    if (!formaPag) {
       console.log("ERRO FORMAPAG")
 
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("Selecione a forma de pagamento da venda!");
+      setDialogMessageError(true);
+      setMsgDialog("Selecione a forma de pagamento da venda!");
       return
     }
-    if(produtos.length === 0){
+    if (produtos.length === 0) {
       console.log("ERRO PRODUTOS")
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("Insira o(s) produto(s) da venda!");
+      setDialogMessageError(true);
+      setMsgDialog("Insira o(s) produto(s) da venda!");
       return
     }
 
@@ -157,34 +160,41 @@ const Venda = () => {
         nome: produto.produto.nome,
         quantidade: parseInt(quantidadesFinais[index])
       }
-      produtosFinal.push(newProduto)
+      if (newProduto.quantidade > produto.produto.estoque) {
+        setDialogMessageError(true)
+        setMsgDialog(`o estoque de ${newProduto.nome} é de apenas ${produto.produto.estoque}`);
+        return
+      }
+      else {
+        produtosFinal.push(newProduto)
+      }
     })
 
-    console.log(produtosFinal)
+    if (produtosFinal.length === quantidadesFinais.length) {
+      const objVendaInsert = {
+        data: data,
+        cliente: cliente,
+        forma_pag: formaPag,
+        produtos: produtosFinal,
+        vlr_total: valorTotal
+      }
 
-    const objVendaInsert = {
-      data: data,
-      cliente: cliente,
-      forma_pag: formaPag,
-      produtos: produtosFinal,
-      vlr_total: valorTotal
-    }
+      const res = await VendaActions.Insert(objVendaInsert)
 
-    const res = await VendaActions.Insert(objVendaInsert)
+      console.log(res)
 
-    console.log(res)
-
-    if(res.status === 200){
-      setSnackbarVisible(true)
-      setSnackbarMessage("Venda inserida com sucesso!")
-      setFormaPag('')
-      setCliente('')
-      setProdutos([])
-      setQuantidadesFinais([])
-    }
-    else{
-      setSnackbarErrorVisible(true)
-      setSnackbarMessage("DEU RUIM INSERIR A VENDA")
+      if (res.status === 200) {
+        setDialogMessageSuccess(true)
+        setMsgDialog("Venda realizada com sucesso!")
+        setFormaPag('')
+        setCliente('')
+        setProdutos([])
+        setQuantidadesFinais([])
+      }
+      else {
+        setDialogMessageError(true)
+        setMsgDialog("DEU RUIM INSERIR A VENDA")
+      }
     }
   };
 
@@ -200,8 +210,29 @@ const Venda = () => {
     setValorTotal(decimalDigitsMask((vlrTotalVenda * 100).toString(), 2))
   }, [produtos, quantidadesFinais])
 
+
+  const handleConfirm = () => {
+    onSubmit()
+    setDialogConfirm(false);
+  };
+
+  const handleCancel = () => {
+    setDialogConfirm(false);
+  };
+
   return (
     <View style={{ flex: 1 }}>
+
+      <DialogConfirm
+        visible={dialogConfirm}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        message={msgDialog}
+      />
+
+      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'}/>
+
+      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'}/>
 
       {cameraOpen &&
 
@@ -226,15 +257,6 @@ const Venda = () => {
         <ScrollView style={{ flex: 1 }}>
 
           <View style={styles.container}>
-
-          <SnackbarGeneric
-          visible={snackbarErrorVisible}
-          message={snackbarMessage}
-          setVisible={setSnackbarErrorVisible}
-          type={'erro'}
-          duration={2500}
-          position={'top'}
-        />
 
             <MyDateTimePicker date={data} setDate={setData} />
 
@@ -269,6 +291,7 @@ const Venda = () => {
                     setValorTotal(decimalDigitsMask(text, 2))
                   }}
                   keyboardType="numeric"
+                  mode='outlined'
                 />
 
               </View>
@@ -276,13 +299,6 @@ const Venda = () => {
             </Card>
 
             <Card style={styles.cardInformacoes}>
-
-              <SnackbarGeneric
-                visible={snackbarVisible}
-                message={snackbarMessage}
-                setVisible={setSnackbarVisible}
-                onDismiss={() => navigation.navigate('Home')}
-              />
 
               <Text style={styles.titleInformacoes}>Produtos</Text>
 
@@ -364,8 +380,8 @@ const Venda = () => {
 
 
             <ButtonGeneric
-              onPress={() => onSubmit()}
-              title={'Confirmar venda'}
+              onPress={() => {setDialogConfirm(true) ; setMsgDialog('Finalizar venda?')}}
+              title={'Finalizar venda'}
               backgroundColor={'green'}
             />
           </View>
@@ -378,9 +394,9 @@ const Venda = () => {
         onBackdropPress={closeModal}
       >
         <SnackbarGeneric
-          visible={snackbarErrorVisible}
-          message={snackbarMessage}
-          setVisible={setSnackbarErrorVisible}
+          visible={dialogMessageError}
+          message={msgDialog}
+          setVisible={setDialogMessageError}
           type={'erro'}
           duration={2500}
           position={'top'}
@@ -477,12 +493,14 @@ const styles = StyleSheet.create({
   },
   cardInformacoes: {
     padding: 20,
-    backgroundColor: '#98FB98',
+    backgroundColor: 'white',
     marginBottom: 20
   },
   titleInformacoes: {
     marginBottom: 20,
     fontSize: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'black'
   },
   quantidadeContainer: {
     alignItems: 'center',

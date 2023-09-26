@@ -32,15 +32,12 @@ const LoginScreen = () => {
 
     const res = await authContext.login(data);
 
-    if (res.status === 200) {
-      const usuarioLogado = await res.json();
+    if (res !== 'ERRO') {
+      const usuarioLogado = res
       await storeUser(usuarioLogado)
-      console.log(usuarioLogado)
       setSnackbarVisible(true);
-      console.log(authContext.isAuthenticated)
       setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
     } else {
-      const msgErro = await res
       setSnackbarVisible(true);
       setSnackbarMessage('Falha ao fazer login');
     }

@@ -8,7 +8,8 @@ const ButtonGeneric = ({ onPress, title, backgroundColor, icon, marginTop }) => 
         loginButton: {
             backgroundColor: backgroundColor || '#2196F3',
             marginBottom: 0,
-            marginTop: marginTop || null
+            marginTop: marginTop || null,
+            borderRadius: 5,
         },
         loginButtonContent: {
             height: 50,

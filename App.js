@@ -28,9 +28,7 @@ export default function App() {
         <AuthProvider>
           <FormProvider {...methods}>
             <PaperProvider theme={theme}>
-              <NavigationContainer>
                 <Main />
-              </NavigationContainer>
             </PaperProvider>
           </FormProvider>
         </AuthProvider>

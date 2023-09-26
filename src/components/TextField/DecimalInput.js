@@ -12,6 +12,7 @@ const DecimalInput = (label, value, setValue) => {
         setValue(decimalDigitsMask(text, 2))
       }}
       keyboardType="numeric"
+      
     />
   );
 };

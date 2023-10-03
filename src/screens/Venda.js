@@ -52,7 +52,7 @@ const Venda = () => {
   const [msgDialog, setMsgDialog] = useState()
   const [dialogMessageSuccess, setDialogMessageSuccess] = useState(false)
 
-  const [modal, setModal] = useState(false)
+  const [modalProduto, setModalProduto] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -68,7 +68,7 @@ const Venda = () => {
     if (res.status === 200) {
       const produtoEncontrado = await res.json()
       setProduto(produtoEncontrado)
-      setModal(true)
+      setModalProduto(true)
       setCameraOpen(false);
     }
     else {
@@ -77,12 +77,12 @@ const Venda = () => {
 
   };
 
-  const closeModal = () => {
-    setModal(false)
+  const closeModalProduto = () => {
+    setModalProduto(false)
   }
 
   const cancelarProduto = () => {
-    closeModal()
+    closeModalProduto()
     setCameraOpen(true)
     setScanned(false);
     setProduto(null)
@@ -100,7 +100,7 @@ const Venda = () => {
     if (!produtoJaExiste) {
       setProdutos([...produtos, newProduto]);
       setQuantidadesFinais([...quantidadesFinais, quantidade]);
-      closeModal();
+      closeModalProduto();
     }
     else {
       setDialogMessageError(true);
@@ -235,9 +235,7 @@ const Venda = () => {
       <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'}/>
 
       {cameraOpen &&
-
         <SafeAreaView style={styles.containerCamera}>
-
           <BarCodeScanner
             onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
@@ -390,8 +388,8 @@ const Venda = () => {
       }
 
       <Modal
-        isVisible={modal}
-        onBackdropPress={closeModal}
+        isVisible={modalProduto}
+        onBackdropPress={closeModalProduto}
       >
         <SnackbarGeneric
           visible={dialogMessageError}

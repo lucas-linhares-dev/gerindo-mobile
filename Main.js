@@ -12,6 +12,7 @@ import { getUser, storeUser } from './src/services/StorageUser';
 import Base64Image from './src/components/helpers/Base64Image';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons'; // Importe o ícone do pacote que você está usando
+import VendaHistorico from './src/screens/VendaHistorico';
 
 
 const Drawer = createDrawerNavigator();
@@ -57,6 +58,17 @@ export default function Main() {
                             labelStyle={styles.drawerLabelStyle}
                             label="Venda"
                             onPress={() => props.navigation.navigate('Venda')}
+                            style={styles.drawerItem}
+                            icon={() => (
+                                <Ionicons name={"send-outline"} size={22} color="#ffff" />
+                            )}
+                            pressColor='#949994'
+
+                        />
+                        <DrawerItem
+                            labelStyle={styles.drawerLabelStyle}
+                            label="Histórico"
+                            onPress={() => props.navigation.navigate('VendaHistorico')}
                             style={styles.drawerItem}
                             icon={() => (
                                 <Ionicons name={"send-outline"} size={22} color="#ffff" />
@@ -154,6 +166,13 @@ export default function Main() {
                         options={{
                             title: 'Vendas',
                         }}
+                    />
+                    <Drawer.Screen
+                    name="VendaHistorico"
+                    component={VendaHistorico}
+                    options={{
+                        title: 'Histórico',
+                    }}
                     />
                     <Drawer.Screen name="Login" component={LoginScreen} />
                     <Drawer.Screen name="Cadastro" component={CadastroScreen} />

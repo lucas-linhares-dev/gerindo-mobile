@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
 import { TextInput, List, IconButton, Button } from 'react-native-paper';
 
-const SelectGeneric = ({ label, data, fieldExtractor, query, setQuery }) => {
+const SelectGeneric = ({ label, data, fieldExtractor, query, setQuery, setId }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleItemSelect = (item) => {
     setQuery(fieldExtractor(item));
+    setId(item._id)
     setModalVisible(false);
   };
 

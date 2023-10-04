@@ -33,7 +33,11 @@ const Venda = () => {
   const navigation = useNavigation();
 
   const [formaPag, setFormaPag] = useState('');
+  const [formaPagId, setFormaPagId] = useState(null)
+
   const [cliente, setCliente] = useState('');
+  const [clienteId, setClienteId] = useState(null)
+
   const [data, setData] = useState(new Date())
   const [produtos, setProdutos] = useState([])
   const [valorTotal, setValorTotal] = useState('0,00')
@@ -173,8 +177,8 @@ const Venda = () => {
     if (produtosFinal.length === quantidadesFinais.length) {
       const objVendaInsert = {
         data: data,
-        cliente: cliente,
-        forma_pag: formaPag,
+        cliente: clienteId,
+        forma_pag: formaPagId,
         produtos: produtosFinal,
         vlr_total: valorTotal
       }
@@ -269,6 +273,7 @@ const Venda = () => {
                 onValueChange={(value) => setCliente(value)}
                 query={cliente}
                 setQuery={setCliente}
+                setId={setClienteId}
               />
 
               <SelectGeneric
@@ -278,6 +283,7 @@ const Venda = () => {
                 onValueChange={(value) => setFormaPag(value)}
                 query={formaPag}
                 setQuery={setFormaPag}
+                setId={setFormaPagId}
               />
 
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>

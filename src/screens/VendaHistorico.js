@@ -6,6 +6,7 @@ import ButtonGeneric from '../components/Button/ButtonGeneric';
 import DialogConfirm from '../components/Dialog/DialogConfirm';
 import DialogMessage from '../components/Dialog/DialogMessage';
 
+// const API_BASE_URL = "http://10.50.46.113:3001" // NOTBOOK HOMES
 const API_BASE_URL = "http://192.168.1.70:3001" // NOTBOOK HOME
 
 
@@ -33,21 +34,20 @@ const VendaHistorico = () => {
 
   async function getVendas() {
     try {
-        const res = await fetch(`${API_BASE_URL}/vendas/getAll`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-        });
-        const vendas = await res.json()
-        console.log|(vendas)
-        setVendas(vendas);
+      const res = await fetch(`${API_BASE_URL}/vendas/getAll`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const vendas = await res.json()
+      setVendas(vendas);
     } catch (error) {
-        console.log("DEU RUIM PEGAR VENDAS")
+      console.log("DEU RUIM PEGAR VENDAS")
     }
-}
+  }
 
-  useEffect( () => {
+  useEffect(() => {
     getVendas()
   }, [])
 
@@ -61,37 +61,40 @@ const VendaHistorico = () => {
         message={msgDialog}
       />
 
-      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'}/>
+      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'} />
 
-      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'}/>
+      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'} />
 
-        <ScrollView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
 
-          <View style={styles.container}>
+        <View style={styles.container}>
 
-            <Card style={styles.cardInformacoes}>
 
-              <Text style={styles.titleInformacoes}>Vendas</Text>
+          {vendas.length > 0 &&
+            <View>
+              {vendas.map((venda, index) => (
+                <Card style={styles.cardInformacoes} key={venda?._id}>
+                  {/* <View style={styles.produtoContainer} > */}
+                    <Text style={styles.produtoNome}>{venda?.vlr_total}</Text>
+                    <Text style={styles.produtoNome}>{venda?.data}</Text>
+                    <Text style={styles.produtoNome}>{venda?.forma_pag}</Text>
+                    <Text style={styles.produtoNome}>{venda?.vlr_total}</Text>
+                    <Text style={styles.produtoNome}>{venda?.cliente}</Text>
+                  {/* </View> */}
+                </Card>
 
-              {vendas.length > 0 && 
-                <View>
-                  {vendas.map((venda, index) => (
-                    // <View style={styles.produtoContainer} key={venda?._id}>
-                      <Text style={styles.produtoNome}>{venda?.vlr_total}</Text>
-                    // </View>
-                  ))}
-                </View>
+              ))}
+            </View>
 
-                }
-            </Card>
+          } 
 
-            <ButtonGeneric
-              onPress={() => {setDialogConfirm(true) ; setMsgDialog('Finalizar venda?')}}
-              title={'Finalizar venda'}
-              backgroundColor={'green'}
-            />
-          </View>
-        </ScrollView>
+          <ButtonGeneric
+            onPress={() => { setDialogConfirm(true); setMsgDialog('Finalizar venda?') }}
+            title={'Finalizar venda'}
+            backgroundColor={'green'}
+          />
+        </View>
+      </ScrollView>
     </View >
 
   );

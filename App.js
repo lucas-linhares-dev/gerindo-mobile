@@ -34,7 +34,5 @@ export default function App() {
         </AuthProvider>
       </ClienteProvider>
     </FormaPagProvider>
-
-
   );
 }

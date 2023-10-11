@@ -22,15 +22,19 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { VendaActions } from '../actions/VendaActions';
 import DialogConfirm from '../components/Dialog/DialogConfirm';
 import DialogMessage from '../components/Dialog/DialogMessage';
+import { parseISO } from 'date-fns';
 
 
 
-const Venda = () => {
+
+const Venda = ({ route }) => {
 
   const clientes = useCliente()
   const formasPag = useFormaPag()
 
   const navigation = useNavigation();
+
+  const [editMode, setEditMode] = useState(false)
 
   const [formaPag, setFormaPag] = useState('');
   const [formaPagId, setFormaPagId] = useState(null)
@@ -57,6 +61,30 @@ const Venda = () => {
   const [dialogMessageSuccess, setDialogMessageSuccess] = useState(false)
 
   const [modalProduto, setModalProduto] = useState(false)
+
+  useEffect(() => {
+    if (route.params) {
+      const { venda } = route.params;
+      setFormaPag(venda.forma_pag.nome)
+      setCliente(venda.cliente.nome)
+      setFormaPagId(venda.forma_pag._id)
+      setClienteId(venda.cliente._id)
+      setData(parseISO(venda.data))
+      const produtos = []
+      const quantidadesFinais = []
+      venda.produtos.map((produto) => {
+        const newProduto = {
+          produto: produto,
+          quantidade: produto.quantidade
+        }
+        produtos.push(newProduto)
+        quantidadesFinais.push(produto.quantidade)
+      })
+      setQuantidadesFinais(quantidadesFinais)
+      setProdutos(produtos)
+      setEditMode(true)
+    }
+  }, [route.params])
 
   useEffect(() => {
     (async () => {
@@ -133,8 +161,7 @@ const Venda = () => {
   }
 
   const onSubmit = async () => {
-    console.log("SUBMIT")
-    console.log(cliente)
+
     if (!cliente) {
       console.log("ERRO cliente")
 
@@ -162,6 +189,8 @@ const Venda = () => {
       const newProduto = {
         cod_ref: produto.produto._id,
         nome: produto.produto.nome,
+        foto: produto.produto.foto,
+        preco_venda: produto.produto.preco_venda,
         quantidade: parseInt(quantidadesFinais[index])
       }
       if (newProduto.quantidade > produto.produto.estoque) {
@@ -183,9 +212,13 @@ const Venda = () => {
         vlr_total: valorTotal
       }
 
-      const res = await VendaActions.Insert(objVendaInsert)
-
-      console.log(res)
+      if (editMode) {
+        console.log("ACTION EDITAR VENDA")
+        return
+      }
+      else {
+        const res = await VendaActions.Insert(objVendaInsert)
+      }
 
       if (res.status === 200) {
         setDialogMessageSuccess(true)
@@ -210,7 +243,6 @@ const Venda = () => {
       let vlrTotalProduto = preco_venda_format * quantidadesFinais[index]
       vlrTotalVenda += vlrTotalProduto
     });
-    console.log(vlrTotalVenda)
     setValorTotal(decimalDigitsMask((vlrTotalVenda * 100).toString(), 2))
   }, [produtos, quantidadesFinais])
 
@@ -234,9 +266,9 @@ const Venda = () => {
         message={msgDialog}
       />
 
-      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'}/>
+      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'} />
 
-      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'}/>
+      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'} />
 
       {cameraOpen &&
         <SafeAreaView style={styles.containerCamera}>
@@ -383,11 +415,23 @@ const Venda = () => {
 
 
 
-            <ButtonGeneric
-              onPress={() => {setDialogConfirm(true) ; setMsgDialog('Finalizar venda?')}}
-              title={'Finalizar venda'}
-              backgroundColor={'green'}
-            />
+            {editMode ?
+
+              <ButtonGeneric
+                onPress={() => { setDialogConfirm(true); setMsgDialog('Editar venda?') }}
+                title={'Editar venda'}
+                backgroundColor={'gold'}
+              />
+
+              :
+
+              <ButtonGeneric
+                onPress={() => { setDialogConfirm(true); setMsgDialog('Finalizar venda?') }}
+                title={'Finalizar venda'}
+                backgroundColor={'green'}
+              />
+
+            }
           </View>
         </ScrollView>
 

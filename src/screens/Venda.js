@@ -35,6 +35,8 @@ const Venda = ({ route }) => {
   const navigation = useNavigation();
 
   const [editMode, setEditMode] = useState(false)
+  const [idVenda, setIdVenda] = useState(false)
+
 
   const [formaPag, setFormaPag] = useState('');
   const [formaPagId, setFormaPagId] = useState(null)
@@ -52,7 +54,7 @@ const Venda = ({ route }) => {
 
   const [produto, setProduto] = useState(null)
   const [quantidade, setQuantidade] = useState(1)
-
+  
   const [quantidadesFinais, setQuantidadesFinais] = useState([])
 
   const [dialogConfirm, setDialogConfirm] = useState(false)
@@ -70,6 +72,7 @@ const Venda = ({ route }) => {
       setFormaPagId(venda.forma_pag._id)
       setClienteId(venda.cliente._id)
       setData(parseISO(venda.data))
+      setIdVenda(venda._id)
       const produtos = []
       const quantidadesFinais = []
       venda.produtos.map((produto) => {
@@ -204,25 +207,44 @@ const Venda = ({ route }) => {
     })
 
     if (produtosFinal.length === quantidadesFinais.length) {
-      const objVendaInsert = {
-        data: data,
-        cliente: clienteId,
-        forma_pag: formaPagId,
-        produtos: produtosFinal,
-        vlr_total: valorTotal
-      }
-
+      let res = 0
       if (editMode) {
+        const objVendaUpdate = {
+          _id: idVenda,
+          data: data,
+          cliente: clienteId,
+          forma_pag: formaPagId,
+          produtos: produtosFinal,
+          vlr_total: valorTotal
+        }
+  
         console.log("ACTION EDITAR VENDA")
-        return
+        res = await VendaActions.Update(objVendaUpdate)
       }
       else {
-        const res = await VendaActions.Insert(objVendaInsert)
+        const objVendaInsert = {
+          data: data,
+          cliente: clienteId,
+          forma_pag: formaPagId,
+          produtos: produtosFinal,
+          vlr_total: valorTotal
+        }
+  
+        res = await VendaActions.Insert(objVendaInsert)
       }
 
       if (res.status === 200) {
+        if(editMode){
+          setMsgDialog("Venda alterada com sucesso!")
+          setTimeout(() => {
+            navigation.navigate('VendaHistorico');
+
+          }, 2300)
+        }
+        else{        
+          setMsgDialog("Venda realizada com sucesso!")
+        }
         setDialogMessageSuccess(true)
-        setMsgDialog("Venda realizada com sucesso!")
         setFormaPag('')
         setCliente('')
         setProdutos([])
@@ -418,9 +440,10 @@ const Venda = ({ route }) => {
             {editMode ?
 
               <ButtonGeneric
-                onPress={() => { setDialogConfirm(true); setMsgDialog('Editar venda?') }}
-                title={'Editar venda'}
-                backgroundColor={'gold'}
+                onPress={() => { setDialogConfirm(true); setMsgDialog('Salvar alterações?') }}
+                title={'Salvar alterações'}
+                backgroundColor={'green'}
+                marginBottom={15}
               />
 
               :
@@ -429,6 +452,7 @@ const Venda = ({ route }) => {
                 onPress={() => { setDialogConfirm(true); setMsgDialog('Finalizar venda?') }}
                 title={'Finalizar venda'}
                 backgroundColor={'green'}
+                marginBottom={15}
               />
 
             }

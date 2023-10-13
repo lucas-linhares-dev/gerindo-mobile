@@ -8,6 +8,8 @@ import axios from 'axios'
 
 export const VendaActions = {
     Insert,
+    Update,
+    Delete
 }
 
 async function Insert(objInsert) {
@@ -25,3 +27,33 @@ async function Insert(objInsert) {
     }
 }
 
+async function Update(objUpdate) {
+    console.log(objUpdate)
+    try {
+        const res = await axios.post(`${API_BASE_URL}/venda/update`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: objUpdate, // Envia o objeto no corpo da solicitação
+        });
+        return res;
+    } catch (error) {
+        console.log("DEU RUIM")
+    }
+}
+
+async function Delete(id) {
+    console.log(id)
+    try {
+        const res = await axios.delete(`${API_BASE_URL}/venda/delete/${id}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+        });
+        return res;
+    } catch (error) {
+        console.log("DEU RUIM")
+    }
+}

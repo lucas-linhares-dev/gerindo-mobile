@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Button } from 'react-native-paper';
 
-const MyDateTimePicker = ({date, setDate}) => {
+const MyDateTimePicker = ({ date, setDate, buttonText, disablePadding, invertido }) => {
   const [show, setShow] = useState(false);
 
   const onChange = (event, selectedDate) => {
@@ -15,21 +15,56 @@ const MyDateTimePicker = ({date, setDate}) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.rowContainer}>
-        <Button
-          onPress={() => setShow(true)}
-          style={styles.button}
-          mode='elevated'
-        >
-          <Text style={styles.buttonText}>Editar Data</Text>
-        </Button>
-        <View style={styles.dateContainer}>
-          <Text style={styles.dateText}>
-            {format(date, 'dd/MM/yyyy', { locale: ptBR })}
-          </Text>
-        </View>
-      </View>
+    <View style={disablePadding ? { flexDirection: 'column', alignItems: 'center', } : styles.container}>
+      {
+        !invertido ?
+          <View style={styles.rowContainer}>
+            <Button
+              onPress={() => setShow(true)}
+              style={styles.button}
+              mode='elevated'
+            >
+              {buttonText ?
+
+                <Text style={styles.buttonText}>{buttonText}</Text>
+
+                :
+
+                <Text style={styles.buttonText}>Editar Data</Text>
+              }
+            </Button>
+            <View style={styles.dateContainer}>
+              <Text style={styles.dateText}>
+                {format(date, 'dd/MM/yyyy', { locale: ptBR })}
+              </Text>
+            </View>
+          </View>
+          :
+          <View style={styles.rowContainer}>
+
+            <View style={styles.dateContainer}>
+              <Text style={styles.dateText}>
+                {format(date, 'dd/MM/yyyy', { locale: ptBR })}
+              </Text>
+            </View>
+            <Button
+              onPress={() => setShow(true)}
+              style={{    borderRadius: 5, marginLeft: 18
+              }}
+              mode='elevated'
+            >
+              {buttonText ?
+
+                <Text style={styles.buttonText}>{buttonText}</Text>
+
+                :
+
+                <Text style={styles.buttonText}>Editar Data</Text>
+              }
+            </Button>
+          </View>
+      }
+
       {show && (
         <DateTimePicker
           testID="dateTimePicker"
@@ -71,6 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 45
   },
+
   dateText: {
     marginLeft: 8,
   },

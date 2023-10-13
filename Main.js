@@ -85,7 +85,7 @@ export default function Main() {
                                 <Ionicons name={"people-outline"} size={22} color="#ffff" /> // Ícone personalizado
                             )}
                             pressColor='#949994'
-                            // activeBackgroundColor='red'
+                        // activeBackgroundColor='red'
                         />
                         <DrawerItem
                             labelStyle={styles.drawerLabelStyleLogout}
@@ -150,7 +150,9 @@ export default function Main() {
                         name="Clientes"
                         component={Clientes}
                         options={{
-                            title: 'Clientes',
+                            title: 'Cliente',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
                         }}
                     />
                     <Drawer.Screen
@@ -158,21 +160,27 @@ export default function Main() {
                         component={Home}
                         options={{
                             title: 'Home',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
                         }}
                     />
                     <Drawer.Screen
                         name="Venda"
                         component={Venda}
                         options={{
-                            title: 'Vendas',
+                            title: 'Venda',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
                         }}
                     />
                     <Drawer.Screen
-                    name="VendaHistorico"
-                    component={VendaHistorico}
-                    options={{
-                        title: 'Histórico',
-                    }}
+                        name="VendaHistorico"
+                        component={VendaHistorico}
+                        options={{
+                            title: 'Histórico',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
+                        }}
                     />
                     <Drawer.Screen name="Login" component={LoginScreen} />
                     <Drawer.Screen name="Cadastro" component={CadastroScreen} />
@@ -217,7 +225,7 @@ const styles = StyleSheet.create({
         marginLeft: -16,
     },
     drawerItem: {
-        borderBottomWidth: 1,     
+        borderBottomWidth: 1,
         borderBottomColor: 'white',
     },
     drawerItemLogout: {

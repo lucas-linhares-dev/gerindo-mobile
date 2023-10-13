@@ -6,6 +6,13 @@ import ButtonGeneric from '../components/Button/ButtonGeneric';
 import DialogConfirm from '../components/Dialog/DialogConfirm';
 import DialogMessage from '../components/Dialog/DialogMessage';
 import formatarData from "../helpers/formatarData";
+import { VendaActions } from '../actions/VendaActions';
+import { useFormaPag } from '../providers/FormaPagProvider';
+import { useCliente } from '../providers/ClienteProvider';
+import MyDateTimePicker from '../components/DateTimePicker/DateTimePicker';
+import AutocompleteGeneric from '../components/AutoComplete/AutoCompleteGeneric';
+import SelectGeneric from '../components/Select/SelectGeneric';
+import LoadingSpinner from '../components/Dialog/LoadingSpinner';
 
 // const API_BASE_URL = "http://10.50.46.113:3001" // NOTBOOK HOMES
 const API_BASE_URL = "http://192.168.1.70:3001" // NOTBOOK HOME
@@ -19,13 +26,40 @@ const VendaHistorico = () => {
   const [msgDialog, setMsgDialog] = useState();
   const [dialogMessageSuccess, setDialogMessageSuccess] = useState(false);
 
-  const handleConfirm = () => {
-    onSubmit();
+  const [idDelete, setIdDelete] = useState(null)
+
+  const [formaPag, setFormaPag] = useState('');
+  const [formaPagId, setFormaPagId] = useState(null)
+
+  const [cliente, setCliente] = useState('');
+  const [clienteId, setClienteId] = useState(null)
+
+  const clientes = useCliente()
+  const formasPag = useFormaPag()
+
+  const [dataInicial, setDataInicial] = useState(new Date())
+  const [dataFinal, setDataFinal] = useState(new Date())
+
+  const [buscaVazia, setBuscaVazia] = useState(false)
+
+
+  const deleteVenda = async () => {
     setDialogConfirm(false);
+    const res = await VendaActions.Delete(idDelete)
+    if (res.status === 200) {
+      setDialogMessageSuccess(true)
+      setMsgDialog("Venda excluida com sucesso!")
+    }
+    else {
+      setDialogMessageSuccess(true)
+      setMsgDialog("Não foi possível excluir a venda!")
+    }
+    getVendas()
   };
 
   const handleCancel = () => {
     setDialogConfirm(false);
+    setMsgDialog(null)
   };
 
   async function getVendas() {
@@ -43,15 +77,54 @@ const VendaHistorico = () => {
     }
   }
 
+  async function filtrarVendas() {
+    setBuscaVazia(false)
+    setVendas([])
+    const objFilters = {
+      dt_inicial: dataInicial,
+      dt_final: dataFinal,
+      cliente: clienteId,
+      forma_pag: formaPagId
+    };
+
+    // Converte o objeto de filtro em uma string de consulta
+    const queryString = new URLSearchParams(objFilters).toString();
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/vendas/filtrar?${queryString}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const vendas = await res.json();
+      if (vendas.length === 0) {
+        setBuscaVazia(true)
+      }
+      setVendas(vendas);
+    } catch (error) {
+      console.log("DEU RUIM PEGAR VENDAS");
+    }
+  }
+
+
   useEffect(() => {
     getVendas();
   }, []);
+
+
+  const vendaDelete = async (_id) => {
+    if (dialogMessageError) {
+
+    }
+  }
 
   return (
     <View style={{ flex: 1 }}>
       <DialogConfirm
         visible={dialogConfirm}
-        onConfirm={handleConfirm}
+        onConfirm={deleteVenda}
         onCancel={handleCancel}
         message={msgDialog}
       />
@@ -74,7 +147,51 @@ const VendaHistorico = () => {
 
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
-          {vendas.length > 0 && (
+          <Card style={styles.cardInformacoes}>
+
+            <View style={styles.dateContainer}>
+              <Text style={{ marginRight: 20, fontSize: 17 }}>Inicial:</Text>
+              <MyDateTimePicker date={dataInicial} setDate={setDataInicial} disablePadding={true} invertido={true} />
+            </View>
+
+            <View style={styles.dateContainer}>
+              <Text style={{ marginRight: 28, fontSize: 17 }}>Final:</Text>
+              <MyDateTimePicker date={dataFinal} setDate={setDataFinal} disablePadding={true} invertido={true} />
+            </View>
+            <View style={{ marginVertical: 10 }}>
+
+            </View>
+            <AutocompleteGeneric
+              label={"Cliente"}
+              fieldExtractor={(cliente) => cliente.nome}
+              data={clientes.clientes}
+              onValueChange={(value) => setCliente(value)}
+              query={cliente}
+              setQuery={setCliente}
+              setId={setClienteId}
+            />
+
+            <SelectGeneric
+              label={"Forma de pagamento"}
+              fieldExtractor={(formapag) => formapag.nome}
+              data={formasPag.formasPag}
+              onValueChange={(value) => setFormaPag(value)}
+              query={formaPag}
+              setQuery={setFormaPag}
+              setId={setFormaPagId}
+            />
+            <ButtonGeneric
+              marginTop={10}
+              onPress={() => {
+                filtrarVendas()
+              }}
+              title={'Filtrar'}
+              backgroundColor={'blue'}
+            />
+          </Card>
+
+
+          {vendas.length > 0 ? (
             <View>
               {vendas.map((venda, index) => (
                 <Card style={styles.cardInformacoes} key={venda?._id}>
@@ -85,7 +202,7 @@ const VendaHistorico = () => {
                   <ButtonGeneric
                     marginTop={10}
                     onPress={() => {
-                      navigation.navigate('Venda', {venda});
+                      navigation.navigate('Venda', { venda });
                     }}
                     title={'Editar venda'}
                     backgroundColor={'gold'}
@@ -93,8 +210,10 @@ const VendaHistorico = () => {
                   <ButtonGeneric
                     marginTop={10}
                     onPress={() => {
-                      setDialogConfirm(true);
-                      setMsgDialog('Finalizar venda?');
+                      setIdDelete(null)
+                      setDialogConfirm(true)
+                      setMsgDialog('Excluir venda?')
+                      setIdDelete(venda._id)
                     }}
                     title={'Cancelar venda'}
                     backgroundColor={'red'}
@@ -102,7 +221,18 @@ const VendaHistorico = () => {
                 </Card>
               ))}
             </View>
-          )}
+          )
+
+            :
+
+            buscaVazia ?
+              <View style={{marginTop: 20}}>
+                <Text style={styles.notFoundText}>Nenhuma venda encontrada</Text>
+              </View>
+              :
+
+              <LoadingSpinner />
+          }
         </View>
       </ScrollView>
     </View>
@@ -136,7 +266,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 17,
     textDecorationLine: 'underline'
-  }
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10
+  },
+  notFoundText: {
+    fontSize: 20, // Tamanho de fonte maior
+    fontWeight: 'bold', // Deixa o texto mais forte
+    textAlign: 'center', // Alinha o texto ao centro
+    marginTop: 'auto', // Move para o meio vertical
+  },
+
 });
 
 export default VendaHistorico;

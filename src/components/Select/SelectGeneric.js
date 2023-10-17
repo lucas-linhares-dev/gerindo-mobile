@@ -7,7 +7,7 @@ const SelectGeneric = ({ label, data, fieldExtractor, query, setQuery, setId }) 
 
   const handleItemSelect = (item) => {
     setQuery(fieldExtractor(item));
-    setId(item._id)
+    setId(item._id);
     setModalVisible(false);
   };
 
@@ -18,6 +18,12 @@ const SelectGeneric = ({ label, data, fieldExtractor, query, setQuery, setId }) 
   const closeModal = () => {
     setModalVisible(false);
   };
+
+  const handleClear = () => {
+    setQuery(''); // Limpa o campo de texto
+    setId(null)
+  };
+
 
   return (
     <View style={styles.container}>
@@ -30,9 +36,10 @@ const SelectGeneric = ({ label, data, fieldExtractor, query, setQuery, setId }) 
           onChangeText={() => {}}
           style={styles.input}
         />
-        <Button mode="elevated" onPress={openModal} style={styles.searchButton}>
-          <Text style={{color: 'green'}}>Buscar</Text>
-        </Button>
+        <View style={styles.buttonContainer}>
+          <IconButton icon="close" size={20} iconColor="white" onPress={handleClear} style={styles.iconButtonClear} />
+          <IconButton icon="magnify" size={20} iconColor="white" onPress={openModal} style={styles.iconButtonSearch} />
+        </View>
       </View>
       <Modal
         transparent={true}
@@ -75,13 +82,27 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    // backgroundColor: 'white',
   },
-  searchButton: {
-    marginLeft: 10,
-    // backgroundColor: 'green'
-    color: 'green',
-    borderRadius: 5
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  iconButtonSearch: {
+    width: 40, // Defina a largura desejada
+    height: 40, // Defina a altura desejada
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 0,
+    backgroundColor: 'green', // Cor de fundo verde
+  },
+  iconButtonClear: {
+    width: 40, // Defina a largura desejada
+    height: 40, // Defina a altura desejada
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'red', // Cor de fundo vermelha
   },
   item: {
     borderBottomWidth: 1,

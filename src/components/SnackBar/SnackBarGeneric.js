@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Modal, Snackbar, Text } from 'react-native-paper';
 
-const SnackbarGeneric = ({ message, duration = 2000, onDismiss, visible, setVisible, type, position }) => {
+const SnackbarGeneric = ({ message, onDismiss, visible, setVisible, type, position }) => {
 
   const styles = StyleSheet.create({
     container: {
@@ -33,7 +33,7 @@ const SnackbarGeneric = ({ message, duration = 2000, onDismiss, visible, setVisi
         <Snackbar
           visible={visible}
           onDismiss={hideSnackbar}
-          duration={duration}
+          duration={2000}
           style={styles.snackbar}
         >
           <Text style={styles.snackbarText}>{message}</Text>

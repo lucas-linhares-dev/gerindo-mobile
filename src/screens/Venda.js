@@ -17,6 +17,8 @@ import Modal from 'react-native-modal';
 import Base64Image from '../components/helpers/Base64Image';
 import NumberInput from '../components/TextField/NumberInput';
 import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons'; 
+
 import { decimalDigitsMask } from '../helpers/decimalDigitsMask';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { VendaActions } from '../actions/VendaActions';
@@ -54,11 +56,12 @@ const Venda = ({ route }) => {
 
   const [produto, setProduto] = useState(null)
   const [quantidade, setQuantidade] = useState(1)
-  
+
   const [quantidadesFinais, setQuantidadesFinais] = useState([])
 
   const [dialogConfirm, setDialogConfirm] = useState(false)
   const [dialogMessageError, setDialogMessageError] = useState(false)
+  const [dialogMessageErrorProduto, setDialogMessageErrorProduto] = useState(false)
   const [msgDialog, setMsgDialog] = useState()
   const [dialogMessageSuccess, setDialogMessageSuccess] = useState(false)
 
@@ -130,7 +133,7 @@ const Venda = ({ route }) => {
       quantidade: quantidade
     }
 
-    const produtoJaExiste = produtos.some((item) => item.produto._id === newProduto.produto._id);
+    const produtoJaExiste = produtos.some((produto) => editMode ? produto.produto.cod_ref : produto.produto._id === newProduto.produto._id);
 
     if (!produtoJaExiste) {
       setProdutos([...produtos, newProduto]);
@@ -138,7 +141,7 @@ const Venda = ({ route }) => {
       closeModalProduto();
     }
     else {
-      setDialogMessageError(true);
+      setDialogMessageErrorProduto(true);
       setMsgDialog("Esse produto já foi inserido na venda");
     }
   }
@@ -217,7 +220,7 @@ const Venda = ({ route }) => {
           produtos: produtosFinal,
           vlr_total: valorTotal
         }
-  
+
         console.log("ACTION EDITAR VENDA")
         res = await VendaActions.Update(objVendaUpdate)
       }
@@ -229,19 +232,19 @@ const Venda = ({ route }) => {
           produtos: produtosFinal,
           vlr_total: valorTotal
         }
-  
+
         res = await VendaActions.Insert(objVendaInsert)
       }
 
       if (res.status === 200) {
-        if(editMode){
+        if (editMode) {
           setMsgDialog("Venda alterada com sucesso!")
           setTimeout(() => {
             navigation.navigate('VendaHistorico');
 
           }, 2300)
         }
-        else{        
+        else {
           setMsgDialog("Venda realizada com sucesso!")
         }
         setDialogMessageSuccess(true)
@@ -298,14 +301,13 @@ const Venda = ({ route }) => {
             onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
             style={StyleSheet.absoluteFillObject}
           />
-          <View style={{ flex: 1, backgroundColor: 'transparent', flexDirection: 'row' }}>
-            <Button mode="text" style={{ position: 'absolute', bottom: 20, left: 20 }} onPress={() => {
+          <View style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: 20, paddingBottom: 20, }}>  
+            <ButtonGeneric backgroundColor={'red'} marginBottom={0} title={'Fechar'} onPress={() => {
               cancelarProduto()
               setCameraOpen(false)
-            }}>
-              <Text>Fechar</Text>
-            </Button>
+            }} />
           </View>
+
         </SafeAreaView>
       }
 
@@ -431,7 +433,7 @@ const Venda = ({ route }) => {
                 title={'Scannear'}
                 onPress={() => cancelarProduto()}
                 backgroundColor={'blue'}
-                icon={<AntDesign name="camera" size={24} color="white" />} // Passe o ícone como um componente
+                icon={<AntDesign name="camera" size={22} color="white" />} // Passe o ícone como um componente
               />
             </Card>
 
@@ -444,6 +446,7 @@ const Venda = ({ route }) => {
                 title={'Salvar alterações'}
                 backgroundColor={'green'}
                 marginBottom={15}
+                icon={<MaterialIcons name="save-alt" size={22} color="white" />}
               />
 
               :
@@ -453,6 +456,7 @@ const Venda = ({ route }) => {
                 title={'Finalizar venda'}
                 backgroundColor={'green'}
                 marginBottom={15}
+                icon={<MaterialIcons name="save-alt" size={22} color="white" />}
               />
 
             }
@@ -463,25 +467,25 @@ const Venda = ({ route }) => {
 
       <Modal
         isVisible={modalProduto}
-        onBackdropPress={closeModalProduto}
+        backdropOpacity={0.8} // Defina o valor desejado
+        onBackdropPress={() => { }} // Não faz nada quando o fundo é pressionado
       >
         <SnackbarGeneric
-          visible={dialogMessageError}
+          visible={dialogMessageErrorProduto}
           message={msgDialog}
-          setVisible={setDialogMessageError}
+          setVisible={setDialogMessageErrorProduto}
           type={'erro'}
-          duration={2500}
           position={'top'}
         />
         <View style={styles.modalContainer}>
-          <View>
-            <Card>
-              <Card.Content style={styles.cardContent}>
-                <Base64Image base64ImageData={produto?.foto} width={250} height={200} />
-                <Text style={styles.title}>{produto?.nome}</Text>
+          <View style={{ alignItems: 'center' }}>
+            {/* <Card>
+              <Card.Content style={styles.cardContent}> */}
+            <Base64Image base64ImageData={produto?.foto} width={250} height={200} />
+            <Text style={styles.title}>{produto?.nome}</Text>
 
-              </Card.Content>
-            </Card>
+            {/* </Card.Content>
+            </Card> */}
           </View>
         </View>
         <View style={styles.inputQuantidade}>
@@ -493,9 +497,9 @@ const Venda = ({ route }) => {
           />
         </View>
         <View style={styles.buttonContainer}>
+          <ButtonGeneric onPress={finalizarProdutos} title={"Inserir e Finalizar"} marginBottom={10}backgroundColor={'blue'} />
+          <ButtonGeneric onPress={continuarProdutos} title={"Inserir e Scannear"} backgroundColor={'green'} marginBottom={10} />
           <ButtonGeneric onPress={cancelarProduto} title={"Cancelar"} backgroundColor={'red'} />
-          <ButtonGeneric onPress={finalizarProdutos} title={"Finalizar"} />
-          <ButtonGeneric onPress={continuarProdutos} title={"Continuar"} backgroundColor={'green'} />
         </View>
       </Modal>
 
@@ -512,7 +516,8 @@ const styles = StyleSheet.create({
   },
   containerCamera: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)'
   },
   modalContainer: {
     flex: 1,
@@ -522,12 +527,12 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     alignItems: 'center',
-    // backgroundColor: 'blue',
     borderRadius: 5,
     width: 270,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    backgroundColor: 'rgba(0, 0, 0, 0.1)'
   },
   title: {
+    color: 'white',
     fontSize: 24,
     marginTop: 20, // Espaço entre o título e a imagem
   },
@@ -539,13 +544,14 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20, // Espaço entre o campo de entrada e o botão
     borderRadius: 20,
+    marginTop: 50,
+    marginBottom: 20,
 
   },
   buttonContainer: {
-    flexDirection: 'row', // Define o layout como uma linha horizontal
-    justifyContent: 'space-between', // Distribui os botões uniformemente no espaço disponível
+    // flexDirection: 'row', // Define o layout como uma linha horizontal
+    // justifyContent: 'space-between', // Distribui os botões uniformemente no espaço disponível
     marginTop: 20, // Define a margem superior conforme necessário
   },
   produtoContainer: {

@@ -13,6 +13,9 @@ import MyDateTimePicker from '../components/DateTimePicker/DateTimePicker';
 import AutocompleteGeneric from '../components/AutoComplete/AutoCompleteGeneric';
 import SelectGeneric from '../components/Select/SelectGeneric';
 import LoadingSpinner from '../components/Dialog/LoadingSpinner';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 // const API_BASE_URL = "http://10.50.46.113:3001" // NOTBOOK HOMES
 const API_BASE_URL = "http://192.168.1.70:3001" // NOTBOOK HOME
@@ -150,13 +153,9 @@ const VendaHistorico = () => {
           <Card style={styles.cardInformacoes}>
 
             <View style={styles.dateContainer}>
-              <Text style={{ marginRight: 20, fontSize: 17 }}>Inicial:</Text>
-              <MyDateTimePicker date={dataInicial} setDate={setDataInicial} disablePadding={true} invertido={true} />
-            </View>
-
-            <View style={styles.dateContainer}>
-              <Text style={{ marginRight: 28, fontSize: 17 }}>Final:</Text>
-              <MyDateTimePicker date={dataFinal} setDate={setDataFinal} disablePadding={true} invertido={true} />
+              <MyDateTimePicker date={dataInicial} setDate={setDataInicial} disablePadding={true} />
+              <Text style={{marginHorizontal: 10, paddingBottom: 10}}>__</Text>
+              <MyDateTimePicker date={dataFinal} setDate={setDataFinal} disablePadding={true}/>
             </View>
             <View style={{ marginVertical: 10 }}>
 
@@ -187,6 +186,7 @@ const VendaHistorico = () => {
               }}
               title={'Filtrar'}
               backgroundColor={'blue'}
+              icon={<Ionicons name="filter" size={18} color="white" />}
             />
           </Card>
 
@@ -205,7 +205,8 @@ const VendaHistorico = () => {
                       navigation.navigate('Venda', { venda });
                     }}
                     title={'Editar venda'}
-                    backgroundColor={'gold'}
+                    backgroundColor={'#fcc200'}
+                    icon={<Feather name="edit" size={18} color="white" />}
                   />
                   <ButtonGeneric
                     marginTop={10}
@@ -217,6 +218,7 @@ const VendaHistorico = () => {
                     }}
                     title={'Cancelar venda'}
                     backgroundColor={'red'}
+                    icon={<FontAwesome5 name="trash" size={14} color="white" />}
                   />
                 </Card>
               ))}
@@ -270,6 +272,7 @@ const styles = StyleSheet.create({
   dateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 10
   },
   notFoundText: {

@@ -20,6 +20,12 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
     setQuery(text);
   };
 
+  const handleClear = () => {
+    setQuery(''); // Limpa o campo de texto
+    setSuggestions([]); // Limpa as sugestões
+    setId(null)
+  };
+
   // Função para lidar com a pesquisa após um atraso
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -46,7 +52,7 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
 
   const handleItemSelect = (item) => {
     setQuery(fieldExtractor(item));
-    setId(item._id)
+    setId(item._id);
     setModalVisible(false);
   };
 
@@ -68,9 +74,10 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
           mode='outlined'
           style={styles.input}
         />
-        <Button mode="elevated" onPress={openModal} style={styles.searchButton}>
-          <Text style={{color: 'green'}}>Buscar</Text>
-        </Button>
+        <View style={styles.buttonContainer}>
+          <IconButton icon="close" size={20} iconColor="white" onPress={handleClear} style={styles.iconButtonClear} />
+          <IconButton icon="magnify" size={20} iconColor='white' onPress={openModal} style={styles.iconButtonSearch} />
+        </View>
       </View>
       <Modal
         transparent={true}
@@ -113,12 +120,27 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    // backgroundColor: 'white',
   },
-  searchButton: {
-    marginLeft: 10,
-    // backgroundColor: 'green'
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  iconButtonSearch: {
+    width: 40, // Defina a largura desejada
+    height: 40, // Defina a altura desejada,
+    backgroundColor: 'green',
     borderRadius: 5,
+    marginHorizontal: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconButtonClear: {
+    width: 40, // Defina a largura desejada
+    height: 40, // Defina a altura desejada,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   item: {
     borderBottomWidth: 1,

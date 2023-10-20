@@ -71,7 +71,7 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('VendaHistorico')}
                             style={styles.drawerItem}
                             icon={() => (
-                                <Ionicons name={"send-outline"} size={22} color="#ffff" />
+                                <Ionicons name={"book-outline"} size={22} color="#ffff" />
                             )}
                             pressColor='#949994'
 
@@ -215,7 +215,8 @@ const styles = StyleSheet.create({
     drawerLabelStyle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#DCDCDC',
+        // color: '#DCDCDC',
+        color: 'white',
         marginLeft: -16
     },
     drawerLabelStyleLogout: {

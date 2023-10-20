@@ -34,7 +34,7 @@ export function ClienteProvider({ children }) {
 
     // Chame a função de busca de clientes
     fetchClientes();
-  }, []); // Execute a busca apenas uma vez, quando o componente for montado
+  }); 
 
   return (
     <ClienteContext.Provider value={{ clientes }}>

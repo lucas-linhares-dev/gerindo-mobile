@@ -6,6 +6,7 @@ const API_BASE_URL = "http://192.168.1.70:3001" // NOTBOOK HOME
 
 export const ClienteActions = {
     GetAll,
+    Insert
 }
 
 async function GetAll() {
@@ -17,6 +18,23 @@ async function GetAll() {
             },
         });
         return res;
+    } catch (error) {
+        console.log("DEU RUIM")
+    }
+}
+
+async function Insert(objInsert) {
+    console.log(objInsert)
+    try {
+        const res = await fetch(`${API_BASE_URL}/cliente/insert`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(objInsert), // Envia o objeto no corpo da solicitação
+        });
+        return res;
+        console.log(res)
     } catch (error) {
         console.log("DEU RUIM")
     }

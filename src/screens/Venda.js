@@ -322,6 +322,7 @@ const Venda = ({ route }) => {
               <View style={{ borderBotto: 'solid 1px yellow' }}>
                 <Text style={styles.titleInformacoes}>Informações da venda</Text>
               </View>
+
               <AutocompleteGeneric
                 label={"Cliente"}
                 fieldExtractor={(cliente) => cliente.nome}
@@ -497,7 +498,7 @@ const Venda = ({ route }) => {
           />
         </View>
         <View style={styles.buttonContainer}>
-          <ButtonGeneric onPress={finalizarProdutos} title={"Inserir e Finalizar"} marginBottom={10}backgroundColor={'blue'} />
+          <ButtonGeneric onPress={finalizarProdutos} title={"Inserir e Finalizar"} marginBottom={10} backgroundColor={'blue'} />
           <ButtonGeneric onPress={continuarProdutos} title={"Inserir e Scannear"} backgroundColor={'green'} marginBottom={10} />
           <ButtonGeneric onPress={cancelarProduto} title={"Cancelar"} backgroundColor={'red'} />
         </View>

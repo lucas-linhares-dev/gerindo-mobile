@@ -1,148 +1,44 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { apiCorreios } from '../services/apiCorreios';
-import { Camera } from 'expo-camera';
-import { FontAwesome } from '@expo/vector-icons'
-import { Button, useTheme } from 'react-native-paper';
-
-
-export default function Home() {
-
-  const { colors } = useTheme();
-
-  const [CEP, setCEP] = useState('')
-  const [bairro, setBairro] = useState('')
-  const [localidade, setLocalidade] = useState('')
-  const [UF, setUF] = useState('')
-  const [hora, setHora] = useState('')
-  const [nome, setNome] = useState('')
-  const [email, setEmail] = useState('')
-  const [telefone, setTelefone] = useState('')
-  const [cpf, setCpf] = useState('')
-  const [logradouro, setLogradouro] = useState('')
-  const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back)
-  const [hasPermissionCamera, setHasPermissionCamera] = useState(null)
-  const [showCamera, setShowCamera] = useState(false)
-  const cameraRef = useRef(null)
-  const [foto, setFoto] = useState(null)
-  const [openModal, setOpenModal] = useState(null)
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, Card } from 'react-native-paper';
+import { Ionicons, SimpleLineIcons } from '@expo/vector-icons'; // Importe o ícone do pacote que você está usando
 
 
 
-  async function buscarCEP() {
-    try {
-      const response = await apiCorreios.get(`/${CEP}/json/`)
-      console.log(response.data)
-      setLogradouro(response.data.logradouro)
-      setBairro(response.data.bairro)
-      setLocalidade(response.data.localidade)
-      setUF(response.data.uf)
-    }
-    catch (error) {
-      console.log(error)
-    }
-  }
+export default function Home({ navigation }) {
 
-  const inserirCliente = async () => {
-    try {
-      const response = await fetch("http://192.168.1.69:3001/insert_cliente/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome: nome,
-          email: email,
-          telefone: telefone,
-          cpf: cpf,
-          cep: CEP,
-          endereco: logradouro,
-          bairro: bairro,
-          municipio: localidade,
-          foto: foto
-        }),
-      });
-      Alert.alert("Cliente cadastrado com sucesso!");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  async function abrirCamera() {
-    setFoto(null)
-    const { status } = await Camera.requestCameraPermissionsAsync()
-    setShowCamera(true)
-    setHasPermissionCamera(status === 'granted')
-    if (status !== 'granted') {
-      setShowCamera(false)
-    }
-  }
-
-  async function tirarFoto() {
-    if (cameraRef) {
-      const data = await cameraRef.current.takePictureAsync();
-      console.log(data)
-      setFoto(data.uri)
-      setOpenModal(true)
-    }
-  }
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString(); // Obtém a hora atual no formato desejado
-      setHora(timeString);
-    }, 1000);
-
-    return () => clearInterval(interval); // Limpa o intervalo quando o componente for desmontado
-  }, []);
 
   return (
     <>
-      <ScrollView>
-        <View>
-          <TextInput value={nome} onChangeText={(txt) => setNome(txt)} placeholder='Nome'
-            style={styles.campos}
-          />
+      <ScrollView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <Text style={{ fontSize: 25, fontWeight: 'bold', color: 'green' }}>INFOMOBILE</Text>
+          <Text style={{ marginBottom: 40 }}>Gerindo suas vendas de forma fácil e moderna</Text>
 
-          <TextInput value={email} onChangeText={(txt) => setEmail(txt)} placeholder='Email'
-            style={styles.campos}
-          />
-          <View style={styles.containerCep}>
-            <TextInput value={telefone} onChangeText={(txt) => setTelefone(txt)} placeholder='Telefone'
-              style={styles.camposInline}
-            />
+          <TouchableOpacity onPress={() => navigation.navigate('Venda')} style={{ width: '100%' }} activeOpacity={0.9} elevation={5}>
+            <Card style={styles.cardInformacoes}>
+              <View style={styles.viewCard}>
+                <SimpleLineIcons name="handbag" size={22} color="white" />
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', textAlign: 'center', marginLeft: 10 }} >Venda</Text>
+              </View>
+            </Card>
+          </TouchableOpacity>
 
-            <TextInput value={cpf} onChangeText={(txt) => setCpf(txt)} placeholder='CPF'
-              style={styles.camposInline}
-            />
-          </View>
+          <TouchableOpacity onPress={() => navigation.navigate('VendaHistorico')} style={{ width: '100%' }} activeOpacity={0.9} elevation={5}>
+            <Card style={styles.cardInformacoes}>
+              <View style={styles.viewCard}>
+                <Ionicons name={"book-outline"} size={22} color="#ffff" />
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', textAlign: 'center', marginLeft: 10 }} >Histórico</Text>
+              </View>
+            </Card>
+          </TouchableOpacity>
 
-          <View style={styles.containerCep}>
-            <TextInput value={CEP} onChangeText={(txt) => setCEP(txt)} placeholder='CEP' onBlur={buscarCEP}
-              style={styles.camposInline}
-            />
-
-            <TextInput value={bairro} onChangeText={(txt) => setBairro(txt)} placeholder='Bairro'
-              style={styles.camposInline}
-            />
-          </View>
-
-          <TextInput value={logradouro} onChangeText={(txt) => setLogradouro(txt)} placeholder='Logradouro'
-            style={styles.campos}
-          />
-
-          <View style={styles.containerCep}>
-            <TextInput value={localidade} onChangeText={(txt) => setLocalidade(txt)} placeholder='Municipio'
-              style={styles.camposInline}
-            />
-            <TextInput value={UF} onChangeText={(txt) => setUF(txt)} placeholder='Estado'
-              style={styles.camposInline}
-            />
-          </View>
-
-          <TouchableOpacity style={styles.botaoBuscar} onPress={inserirCliente}>
-            <Text style={styles.textoBotao}>CADASTRAR</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Clientes')} style={{ width: '100%' }} activeOpacity={0.9} elevation={5}>
+            <Card style={styles.cardInformacoes}>
+              <View style={styles.viewCard}>
+                <Ionicons name={"people-outline"} size={24} color="#ffff" />
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', textAlign: 'center', marginLeft: 10 }} >Clientes</Text>
+              </View>
+            </Card>
           </TouchableOpacity>
 
         </View >
@@ -155,85 +51,24 @@ export default function Home() {
 
 
 const styles = StyleSheet.create({
-  containerPrincipal: {
+  container: {
     flex: 1,
-    flexDirection: 'column',
-    backgroundColor: 'black'
-  },
-  topBar: {
-    flexDirection: 'row',
-    height: 70,
-    backgroundColor: '#006ba8'
-  },
-  title: {
-    color: 'white',
-    fontSize: 25,
-    fontWeight: 'bold',
-    alignSelf: 'center',
-    margin: 20,
-  },
-  containerCep: {
-    flexDirection: 'row',
-    height: 70,
-    marginHorizontal: 1,
-  },
-  botaoBuscar: {
-    backgroundColor: '#006ba8',
-    width: "97%",
-    height: 70,
     marginTop: 20,
-    borderRadius: 5,
-    padding: 20,
-    alignSelf: 'center'
-  },
-  textoBotao: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    alignSelf: 'center'
-  },
-  campos: {
-    borderColor: 'blue',
-    borderWidth: 2,
-    padding: 15,
-    fontSize: 18,
-    borderRadius: 10,
-    marginTop: 10,
-    marginHorizontal: 8
-  },
-  camposInline: {
-    borderColor: 'blue',
-    borderWidth: 2,
-    padding: 15,
-    fontSize: 18,
-    borderRadius: 10,
-    marginTop: 10,
-    marginHorizontal: 5,
-    width: '47%'
-  },
-  timeText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    color: 'white'
-  },
-  containerGeneric: {
-    width: '100%',
-    height: 400,
-  },
-  containerCamera: {
-    flex: 1,
-    justifyContent: 'center'
-  },
-  buttonCamera: {
+    paddingHorizontal: 20,
+    display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center'
+  },
+  cardInformacoes: {
+    padding: 20,
+    backgroundColor: 'green',
+    marginBottom: 10,
+    width: '100%',
+  },
+  viewCard: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#121212',
-    margin: 20,
-    borderRadius: 10,
-    height: 50,
+    justifyContent: 'center',
   }
 })
 

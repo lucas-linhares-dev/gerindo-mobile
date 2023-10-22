@@ -11,7 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { getUser, storeUser } from './src/services/StorageUser';
 import Base64Image from './src/components/helpers/Base64Image';
 import { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Importe o ícone do pacote que você está usando
+import { Ionicons, SimpleLineIcons, AntDesign } from '@expo/vector-icons'; // Importe o ícone do pacote que você está usando
 import VendaHistorico from './src/screens/VendaHistorico';
 
 
@@ -60,7 +60,7 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Venda')}
                             style={styles.drawerItem}
                             icon={() => (
-                                <Ionicons name={"send-outline"} size={22} color="#ffff" />
+                                <SimpleLineIcons name="handbag" size={22} color="white" />
                             )}
                             pressColor='#949994'
 
@@ -93,7 +93,7 @@ export default function Main() {
                             onPress={async () => await authContext.logout()}
                             style={styles.drawerItemLogout}
                             icon={() => (
-                                <Ionicons name={"log-out-outline"} size={24} color="red" /> // Ícone personalizado
+                                <Ionicons name={"log-out-outline"} size={24} color="white" /> // Ícone personalizado
                             )}
                         />
                     </View>
@@ -105,12 +105,18 @@ export default function Main() {
                             label="Login"
                             onPress={() => props.navigation.navigate('Login')}
                             style={styles.drawerItem}
+                            icon={() => (
+                                <AntDesign name="login" size={22} color="white" />                            
+                            )}
                         />
                         <DrawerItem
                             labelStyle={styles.drawerLabelStyle}
                             label="Cadastro"
                             onPress={() => props.navigation.navigate('Cadastro')}
                             style={styles.drawerItem}
+                            icon={() => (
+                                <AntDesign name="pluscircleo" size={24} color="white" />                            
+                            )}
                         />
                     </View>
                 }
@@ -222,7 +228,7 @@ const styles = StyleSheet.create({
     drawerLabelStyleLogout: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'red',
+        color: 'white',
         marginLeft: -16,
     },
     drawerItem: {
@@ -230,6 +236,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'white',
     },
     drawerItemLogout: {
-        marginTop: 230
+        marginTop: 180,
+        backgroundColor: 'red',
     }
 });

@@ -8,9 +8,17 @@ import { maskCpf, maskPhone } from '../helpers/masks';
 import DialogConfirm from '../components/Dialog/DialogConfirm';
 import DialogMessage from '../components/Dialog/DialogMessage';
 import { ClienteActions } from '../actions/ClienteActions';
+import AutocompleteGeneric from '../components/AutoComplete/AutoCompleteGeneric';
+import { useCliente } from '../providers/ClienteProvider';
 
 
 export default function Clientes() {
+
+  const clientes = useCliente()
+  const [cliente, setCliente] = useState('')
+  const [clienteId, setClienteId] = useState('')
+
+  const [clienteObj, setClienteObj] = useState(null)
 
   const [CEP, setCEP] = useState('')
   const [bairro, setBairro] = useState('')
@@ -62,7 +70,7 @@ export default function Clientes() {
       return
     }
 
-    const objClienteInsert = {
+    const objClienteResquest = {
       nome: nome,
       email: email,
       telefone: telefone,
@@ -71,12 +79,21 @@ export default function Clientes() {
       endereco: logradouro,
       bairro: bairro,
       municipio: localidade,
-      numero: numero
+      numero: numero,
+      estado: UF,
+      _id: clienteObj?._id
     }
 
-    const res = ClienteActions.Insert(objClienteInsert)
+    if(msgDialog === "Cadastrar cliente?"){
+      const res = ClienteActions.Insert(objClienteResquest)
+      setMsgDialog("Cliente cadastrado com sucesso!")
+    }
+    else{
+      const res = ClienteActions.Update(objClienteResquest)
+      setMsgDialog("Cliente alterado com sucesso!")
+      setCliente('')
+    }
 
-    setMsgDialog("Cliente cadastrado com sucesso!")
     setDialogMessageSuccess(true)
 
     setNome('')
@@ -88,12 +105,41 @@ export default function Clientes() {
     setBairro('')
     setNumero('')
     setLocalidade('')
+    setUF('')
   };
 
   const handleConfirm = () => {
     onSubmit()
     setDialogConfirm(false);
   };
+
+
+  useEffect(() => {
+    if(clienteObj){
+      setNome(clienteObj.nome)
+      setCpf(clienteObj.cpf)
+      setEmail(clienteObj?.email)
+      setTelefone(clienteObj?.telefone)
+      setCEP(clienteObj?.cep)
+      setLogradouro(clienteObj?.endereco)
+      setBairro(clienteObj?.bairro)
+      setLocalidade(clienteObj?.municipio)
+      setNumero(clienteObj?.numero)
+      setUF(clienteObj?.estado)
+    }
+    else{
+      setNome('')
+      setTelefone('')
+      setCpf('')
+      setEmail('')
+      setCEP('')
+      setLogradouro('')
+      setBairro('')
+      setNumero('')
+      setLocalidade('')
+      setUF('')
+    }
+  }, [clienteObj])
 
   return (
     <>
@@ -110,7 +156,17 @@ export default function Clientes() {
 
           <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'} />
           <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => setDialogMessageSuccess(false)} type={'sucesso'} />
-
+          
+          <AutocompleteGeneric
+            label={"Cliente"}
+            fieldExtractor={(cliente) => cliente.nome}
+            data={clientes.clientes}
+            onValueChange={(value) => setCliente(value)}
+            query={cliente}
+            setQuery={setCliente}
+            setId={setClienteId}
+            setObj={setClienteObj}
+          />
 
           <Card style={styles.cardInformacoes}>
 
@@ -147,8 +203,8 @@ export default function Clientes() {
           </Card>
 
           <ButtonGeneric
-            onPress={() => { setDialogConfirm(true); setMsgDialog('Cadastrar cliente?') }}
-            title={'Cadastrar cliente'}
+            onPress={() => { setDialogConfirm(true); clienteObj ? setMsgDialog('Alterar cliente?') : setMsgDialog('Cadastrar cliente?') }}
+            title={clienteObj ? 'Alterar' : 'Cadastrar'}
             backgroundColor={'green'}
             marginBottom={15}
             icon={<MaterialIcons name="save-alt" size={22} color="white" />}

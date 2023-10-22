@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback, Text } from 'react-native';
 import { TextInput, List, IconButton, Button } from 'react-native-paper';
 
-const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, setId }) => {
+const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, setId, setObj}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -21,6 +21,7 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
   };
 
   const handleClear = () => {
+    setObj(null)
     setQuery(''); // Limpa o campo de texto
     setSuggestions([]); // Limpa as sugestões
     setId(null)
@@ -51,6 +52,9 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
   }, [query]);
 
   const handleItemSelect = (item) => {
+    if(setObj){
+      setObj(item)
+    }
     setQuery(fieldExtractor(item));
     setId(item._id);
     setModalVisible(false);

@@ -6,7 +6,7 @@ const Base64Image = ({ base64ImageData, width, height, redonda }) => {
     <View>
       <Image
         source={{ uri: `data:image/png;base64,${base64ImageData}` }}
-        style={{ width: width, height: height, borderRadius: redonda ? 100 : 0, borderRadius: 5}}
+        style={{ width: width, height: height, borderRadius: redonda ? 100 : 5}}
       />
     </View>
   );

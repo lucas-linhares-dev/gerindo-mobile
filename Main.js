@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
+import {Text} from 'react-native-paper'
 import Clientes from './src/screens/Clientes';
 import Home from './src/screens/Home';
 import CadastroScreen from './src/screens/Cadastro';
@@ -24,23 +25,41 @@ export default function Main() {
     const [usuario, setUsuario] = useState()
     const [authenticated, setAuthenticated] = useState();
 
+    useEffect(() => {
+        setAuthenticated(authContext?.isAuthenticated);
+        console.log(authContext?.usuario)
+        setUsuario(authContext?.usuario)
+        console.log("MAIN")
+    }, [authContext.isAuthenticated]);
+
+    console.log(usuario?.foto)
+
     const CustomHeader = () => {
         return (
+            <>
+            <View style={{paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: 'white', flexDirection: 'row', marginBottom: 15}}>
+                <View style={{}}>
+                    <Text>ICONE</Text>
+                </View>
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', marginLeft: 15}}>InfoMobile</Text>
+            </View>
             <View style={styles.customHeaderContainer}>
                 <View style={styles.avatarContainer}>
-                    <Base64Image base64ImageData={usuario?.foto} height={100} width={100} redonda />
+                    <Base64Image base64ImageData={usuario?.foto} height={110} width={110} redonda />
                     <Text style={styles.username}>{usuario?.nome}</Text>
                     <Text style={{ marginBottom: 20, color: '#DCDCDC' }}>{usuario?.cargo}</Text>
                 </View>
             </View>
+            </>
+
         );
     };
 
     const CustomDrawerContent = (props) => {
         return (
-            <DrawerContentScrollView {...props}>
+            <View>
 
-                {true ?
+                {authenticated ?
                     <View>
                         <CustomHeader />
                         <DrawerItem
@@ -90,7 +109,7 @@ export default function Main() {
                         <DrawerItem
                             labelStyle={styles.drawerLabelStyleLogout}
                             label="Logout"
-                            onPress={async () => await authContext.logout()}
+                            onPress={async () => { await authContext.logout(); props.navigation.navigate('Login') }}
                             style={styles.drawerItemLogout}
                             icon={() => (
                                 <Ionicons name={"log-out-outline"} size={24} color="white" /> // Ícone personalizado
@@ -106,7 +125,7 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Login')}
                             style={styles.drawerItem}
                             icon={() => (
-                                <AntDesign name="login" size={22} color="white" />                            
+                                <AntDesign name="login" size={22} color="white" />
                             )}
                         />
                         <DrawerItem
@@ -115,27 +134,21 @@ export default function Main() {
                             onPress={() => props.navigation.navigate('Cadastro')}
                             style={styles.drawerItem}
                             icon={() => (
-                                <AntDesign name="pluscircleo" size={24} color="white" />                            
+                                <AntDesign name="pluscircleo" size={24} color="white" />
                             )}
                         />
                     </View>
                 }
-            </DrawerContentScrollView>
+            </View>
         );
     };
-
-    useEffect(() => {
-        setAuthenticated(authContext?.isAuthenticated);
-        setUsuario(authContext?.usuario)
-        console.log("MAIN")
-    }, [authContext.isAuthenticated]);
 
     return (
         <NavigationContainer>
 
             {true ? (
                 <Drawer.Navigator
-                    initialRouteName="Home"
+                    initialRouteName="Login"
                     drawerContent={props => <CustomDrawerContent {...props} />}
                     screenOptions={{
                         drawerStyle: {
@@ -188,8 +201,20 @@ export default function Main() {
 
                         }}
                     />
-                    <Drawer.Screen name="Login" component={LoginScreen} />
-                    <Drawer.Screen name="Cadastro" component={CadastroScreen} />
+                    <Drawer.Screen name="Login" component={LoginScreen}
+                        options={{
+                            title: 'Login',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
+                        }}
+                    />
+                    <Drawer.Screen name="Cadastro" component={CadastroScreen}
+                        options={{
+                            title: 'Login',
+                            unmountOnBlur: true, // Esta opção fará com que a tela seja redefinida quando você voltar para ela
+
+                        }}
+                    />
                 </Drawer.Navigator>
             ) : (
                 <Drawer.Navigator initialRouteName="Login">
@@ -236,7 +261,7 @@ const styles = StyleSheet.create({
         borderBottomColor: 'white',
     },
     drawerItemLogout: {
-        marginTop: 180,
+        marginTop: 125,
         backgroundColor: 'red',
     }
 });

@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://192.168.1.69:3001"
+const API_BASE_URL = "http://192.168.1.70:3001"
 // const API_BASE_URL = "http://10.50.42.175:3001"
 
 

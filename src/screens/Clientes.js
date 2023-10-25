@@ -92,6 +92,7 @@ export default function Clientes() {
       const res = ClienteActions.Update(objClienteResquest)
       setMsgDialog("Cliente alterado com sucesso!")
       setCliente('')
+      clientes.setReload((prev) => !prev)
     }
 
     setDialogMessageSuccess(true)

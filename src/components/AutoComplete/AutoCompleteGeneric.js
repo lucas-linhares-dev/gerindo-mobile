@@ -21,7 +21,9 @@ const AutocompleteGeneric = ({ label, data, fieldExtractor, query, setQuery, set
   };
 
   const handleClear = () => {
-    setObj(null)
+    if(setObj){
+      setObj(null)
+    }
     setQuery(''); // Limpa o campo de texto
     setSuggestions([]); // Limpa as sugestões
     setId(null)

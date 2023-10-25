@@ -14,6 +14,7 @@ import { useCliente } from '../providers/ClienteProvider';
 import SelectGeneric from '../components/Select/SelectGeneric';
 import { useFormaPag } from '../providers/FormaPagProvider';
 import MyDateTimePicker from '../components/DateTimePicker/DateTimePicker';
+import DialogMessage from '../components/Dialog/DialogMessage';
 
 
 
@@ -24,8 +25,9 @@ const LoginScreen = () => {
   const { control, handleSubmit, errors } = useForm();
   const navigation = useNavigation();
 
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [dialogMessageError, setDialogMessageError] = useState(false);
+  const [dialogMessageSuccess, setDialogMessageSuccess] = useState('');
+  const [msgDialog, setMsgDialog] = useState('')
 
 
   const onSubmit = async (data) => {
@@ -35,16 +37,19 @@ const LoginScreen = () => {
     if (res !== 'ERRO') {
       const usuarioLogado = res
       await storeUser(usuarioLogado)
-      setSnackbarVisible(true);
-      setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
+      setDialogMessageSuccess(true);
+      setMsgDialog('Seja bem vindo novamente ' + usuarioLogado.nome + '!');
     } else {
-      setSnackbarVisible(true);
-      setSnackbarMessage('Falha ao fazer login');
+      setDialogMessageError(true);
+      setMsgDialog('Falha ao fazer login');
     }
   };
 
   return (
     <View style={styles.container}>
+
+      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'} />
+      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => {setDialogMessageSuccess(false) ; navigation.navigate('Home')}} type={'sucesso'} />
       
       <TextFieldGeneric
         control={control}
@@ -65,6 +70,9 @@ const LoginScreen = () => {
       <ButtonGeneric
         onPress={handleSubmit(onSubmit)}
         title={'Entrar'}
+        marginTop={10}
+        backgroundColor={'green'}
+
       />
 
       <Text variant="titleMedium" style={{ marginVertical: 10, marginHorizontal: 108 }}>Não tem cadastro?</Text>
@@ -72,16 +80,6 @@ const LoginScreen = () => {
       <ButtonGeneric
         onPress={() => navigation.navigate('Cadastro')}
         title={'Cadastrar-se'}
-        backgroundColor={'green'}
-      />
-      <SnackbarGeneric
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        type={'erro'}
-        setVisible={setSnackbarVisible}
-        onDismiss={() => {
-
-        }}
       />
 
     </View>

@@ -17,7 +17,7 @@ const TextFieldGeneric = ({ control, name, label, rules, defaultValue, type }) =
             onChangeText={(text) => field.onChange(text)}
             style={styles.input}
             secureTextEntry = {type === 'password'}
-            // mode='outlined'
+            mode='outlined'
           />
         )}
         name={name}
@@ -30,7 +30,7 @@ const TextFieldGeneric = ({ control, name, label, rules, defaultValue, type }) =
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 5,
   },
   input: {
     backgroundColor: 'transparent',

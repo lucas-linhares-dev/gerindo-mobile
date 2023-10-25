@@ -57,7 +57,7 @@ const VendaHistorico = () => {
       setDialogMessageSuccess(true)
       setMsgDialog("Não foi possível excluir a venda!")
     }
-    getVendas()
+    filtrarVendas()
   };
 
   const handleCancel = () => {
@@ -65,20 +65,6 @@ const VendaHistorico = () => {
     setMsgDialog(null)
   };
 
-  async function getVendas() {
-    try {
-      const res = await fetch(`${API_BASE_URL}/vendas/getAll`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const vendas = await res.json();
-      setVendas(vendas);
-    } catch (error) {
-      console.log("DEU RUIM PEGAR VENDAS");
-    }
-  }
 
   async function filtrarVendas() {
     setBuscaVazia(false)
@@ -113,7 +99,7 @@ const VendaHistorico = () => {
 
 
   useEffect(() => {
-    getVendas();
+    filtrarVendas();
   }, []);
 
 

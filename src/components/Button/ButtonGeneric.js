@@ -6,7 +6,7 @@ const ButtonGeneric = ({ onPress, title, backgroundColor, icon, marginTop, margi
 
     const styles = StyleSheet.create({
         loginButton: {
-            backgroundColor: backgroundColor || '#2196F3',
+            backgroundColor: backgroundColor || 'blue',
             marginBottom: marginBottom || 0,
             marginTop: marginTop || null,
             borderRadius: 5,

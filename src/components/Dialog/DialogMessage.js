@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Dialog, Paragraph, Portal } from 'react-native-paper';
 
-const DialogMessage = ({ visible, setVisible, onCancel, message, type }) => {
+const DialogMessage = ({ visible, setVisible, onCancel, message, type, onDismiss }) => {
   useEffect(() => {
     if (visible) {
       setTimeout(() => {
         setVisible(false);
+        if(onDismiss){
+          onDismiss()
+        }
       }, 2200);
     }
   }, [visible]);

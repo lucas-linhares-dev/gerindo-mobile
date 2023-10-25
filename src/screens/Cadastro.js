@@ -6,8 +6,8 @@ import { storeUser } from '../services/StorageUser';
 import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import TextFieldGeneric from '../components/TextField/TextFieldGeneric';
-import SnackbarGeneric from '../components/SnackBar/SnackBarGeneric';
 import ButtonGeneric from '../components/Button/ButtonGeneric';
+import DialogMessage from '../components/Dialog/DialogMessage';
 
 
 const CadastroScreen = () => {
@@ -15,15 +15,17 @@ const CadastroScreen = () => {
   const { control, handleSubmit, errors, getValues } = useForm();
   const navigation = useNavigation();
 
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarErrorVisible, setSnackbarErrorVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [dialogMessageError, setDialogMessageError] = useState(false);
+  const [dialogMessageSuccess, setDialogMessageSuccess] = useState('');
+  const [msgDialog, setMsgDialog] = useState('')
 
   const onSubmit = async (data) => {
 
+    console.log(data)
+
     if(data.senha !== data.confirmacaoSenha){
-      setSnackbarErrorVisible(true);
-      setSnackbarMessage("As senhas não correspondem");
+      setDialogMessageError(true);
+      setMsgDialog("As senhas não correspondem");
     }
     else{
       const res = await UsuarioActions.Cadastrar(data)
@@ -31,23 +33,22 @@ const CadastroScreen = () => {
       if (res.status === 200) {
         const usuarioLogado = await res.json();
         await storeUser(res)
-        setSnackbarVisible(true);
-        setSnackbarMessage('Seja bem vindo ' + usuarioLogado.nome);
+        setDialogMessageSuccess(true);
+        setMsgDialog('Seja bem vindo ' + usuarioLogado.nome + '!');
       } else {
-        setSnackbarVisible(true);
-        setSnackbarMessage('Falha ao fazer login');
+        setDialogMessageError(true);
+        setMsgDialog('Falha ao cadastrar-se');
       }
     }
   };
+  
 
   return (
     <View style={styles.container}>
-      <SnackbarGeneric
-        visible={snackbarErrorVisible}
-        message={snackbarMessage}
-        setVisible={setSnackbarErrorVisible}
-        type={'erro'}
-      />
+
+      <DialogMessage visible={dialogMessageError} setVisible={setDialogMessageError} message={msgDialog} onDismiss={() => setDialogMessageError(false)} type={'erro'} />
+      <DialogMessage visible={dialogMessageSuccess} setVisible={setDialogMessageSuccess} message={msgDialog} onDismiss={() => {setDialogMessageSuccess(false) ; navigation.navigate('Login')}} type={'sucesso'} />
+
       <TextFieldGeneric
         control={control}
         name="nome" 
@@ -81,6 +82,9 @@ const CadastroScreen = () => {
       <ButtonGeneric
         onPress={handleSubmit(onSubmit)}
         title={'Cadastrar-se'}
+        marginTop={10}
+        backgroundColor={'green'}
+
       />
 
       <Text variant="titleMedium" style={{marginVertical: 10, marginHorizontal: 110}}>Já é cadastrado?</Text>
@@ -88,14 +92,8 @@ const CadastroScreen = () => {
       <ButtonGeneric
         onPress={() => navigation.navigate('Login')}
         title={'Fazer login'}
-        backgroundColor={'green'}
       />
-      <SnackbarGeneric
-        visible={snackbarVisible}
-        message={snackbarMessage}
-        setVisible={setSnackbarVisible}
-        onDismiss={() => navigation.navigate('Home')}
-      />
+
     </View>
   );
 };

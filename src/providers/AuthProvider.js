@@ -5,16 +5,16 @@ import { storeUser } from '../services/StorageUser';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, navigation }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [usuario, setUsuario] = useState({})
 
   const login = async (data)  => {
     const res = await UsuarioActions.Logar(data)
     if(res.status === 200){
-        setIsAuthenticated(true);
         const usuario = await res.json();
         setUsuario(usuario)
+        setIsAuthenticated(true);
         console.log("LOGOU")
         return usuario
     }

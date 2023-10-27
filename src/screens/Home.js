@@ -1,6 +1,8 @@
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, Card } from 'react-native-paper';
 import { Ionicons, SimpleLineIcons } from '@expo/vector-icons'; // Importe o ícone do pacote que você está usando
+import { LOGO } from '../../assets/logo.png'
+import { Image } from 'react-native';
 
 
 
@@ -11,6 +13,10 @@ export default function Home({ navigation }) {
     <>
       <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={{ width: 200, height: 200, marginBottom: 10 }}
+          />
           <Text style={{ fontSize: 25, fontWeight: 'bold', color: 'green' }}>INFOMOBILE</Text>
           <Text style={{ marginBottom: 40 }}>Gerindo suas vendas de forma fácil e moderna</Text>
 

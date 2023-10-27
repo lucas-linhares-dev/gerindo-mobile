@@ -37,11 +37,12 @@ export default function Main() {
     const CustomHeader = () => {
         return (
             <>
-            <View style={{paddingVertical: 18, borderBottomWidth: 1, borderBottomColor: 'white', flexDirection: 'row', marginBottom: 15}}>
-                <View style={{}}>
-                    <Text>ICONE</Text>
-                </View>
-                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', marginLeft: 15}}>InfoMobile</Text>
+            <View style={{paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: 'white', flexDirection: 'row', marginBottom: 15}}>
+                <Image
+                    source={require('../gerindo-mobile/assets/logo.png')}
+                    style={{ width: 27, height: 27, marginBottom: 0, marginLeft: 10 }}
+                />
+                <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'white', marginLeft: 10}}>InfoMobile</Text>
             </View>
             <View style={styles.customHeaderContainer}>
                 <View style={styles.avatarContainer}>
